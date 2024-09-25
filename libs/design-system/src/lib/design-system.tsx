@@ -1,30 +1,15 @@
-
-
-
-
-
-  import styled from 'tailwind';
-  
-
+import styled from 'tailwind';
 
 const StyledDesignSystem = styled.div`
   color: pink;
 `;
 
+export function DesignSystem() {
+  return (
+    <StyledDesignSystem>
+      <h1>Welcome to DesignSystem!</h1>
+    </StyledDesignSystem>
+  );
+}
 
-  
-  export function DesignSystem() {
-    return (
-      <StyledDesignSystem>
-        
-        <h1>Welcome to DesignSystem!</h1>
-        
-      </StyledDesignSystem>
-    );
-  }
-  
-
-  export default DesignSystem;
-
-
-
+export default DesignSystem;
