@@ -116,4 +116,76 @@ npx nx g @nx/react:library <LIB_NAME> --directory=libs --bundler=vite --unitTest
 npx nx g @nx/react:storybook-configuration <TARGET_LIB> --directory=libs --bundler=vite
 ```
 
-npm install eslint@^8.57.1 eslint-plugin-import@^2.30.0 --save-dev
+### Running apps locally
+
+Running development server:
+
+```
+nx serve <APP_NAME> (react and express)
+nx start <APP_NAME> (nextjs)
+```
+
+Running test:
+
+```
+nx test <APP_NAME>
+nx test <APP_NAME> --watch
+```
+
+Running build process:
+
+```
+nx build <APP_NAME>
+```
+
+Running lint:
+
+```
+nx lint <APP_NAME>
+nx format:write <APP_NAME>
+nx format:check <APP_NAME>
+```
+
+See dependencies:
+
+```
+nx dep-graph
+```
+
+Para correr estos comando en las aplicacioens afectadas:
+
+```
+nx affected:<COMMAND>
+```
+
+Lanzar storybook y construirlo:
+
+```
+nx storybook <COMPONENTS_LIB>
+nx build-storybook <COMPONENTS_LIB>
+```
+
+### Build Docker images
+
+Running from root directory:
+
+```
+docker build -t api-core -f apps/api-core/Dockerfile .
+```
+
+#### Install Husky
+
+```
+brew install bash
+```
+
+```
+npm install husky --save-dev
+npx husky install
+```
+
+### Add a pre-commmit
+
+```
+echo "npx prettier --check ." > .husky/pre-commit
+```
