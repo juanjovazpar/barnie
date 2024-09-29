@@ -78,6 +78,8 @@ And join the Nx community:
 
 ### Process to receate
 
+Node version 20
+
 #### Init mono repository with NX:
 
 ```
@@ -188,4 +190,10 @@ npx husky install
 
 ```
 echo "npx prettier --check ." > .husky/pre-commit
+```
+
+## Building images:
+
+```
+docker build -t api-core -f ./apps/api-core/Dockerfile ./
 ```
