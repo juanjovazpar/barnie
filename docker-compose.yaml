@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  api-core:
+    build:
+      dockerfile: ./apps/api-core/Dockerfile
+      target: development
+      context: .
+    command: npm run serve:api-core
+    expose:
+      - 3000
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 5010
+      DATABASE_USER: api1
+      DATABASE_NAME: api1
+      DATABASE_PASSWORD: TopSecret123
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+networks:
+  default:
+    name: example_dev_network
+    driver: bridge
