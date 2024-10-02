@@ -197,3 +197,9 @@ echo "npx prettier --check ." > .husky/pre-commit
 ```
 docker build -t api-core -f ./apps/api-core/Dockerfile ./
 ```
+
+## List projects
+
+`````
+nx show projects
+`````
