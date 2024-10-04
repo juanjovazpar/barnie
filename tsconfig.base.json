@@ -19,7 +19,8 @@
       "@barnie/utils": ["libs/utils/index.ts"],
       "@barnie/constants": ["libs/utils/src/constants/index.ts"],
       "@barnie/interfaces": ["libs/utils/src/interfaces/index.ts"],
-      "@barnie/helpers": ["libs/utils/src/helpers/index.ts"]
+      "@barnie/helpers": ["libs/utils/src/helpers/index.ts"],
+      "@barnie/middlewares": ["libs/utils/src/middlewares/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

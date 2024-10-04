@@ -1,12 +1,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-import { isValidEmail, getJWToken, comparePasswords } from '@barnie/helpers';
+import { isValidEmail, comparePasswords } from '@barnie/helpers';
 import { HTTP } from '@barnie/constants';
 
 import User from '../models/user.model';
 import { ICoreUser } from '@barnie/interfaces';
-
-const getToken = getJWToken(process.env.JWT_SECRET);
 
 // TODO: Store this in the interafaces library
 interface SignupBody {
@@ -14,10 +12,10 @@ interface SignupBody {
   password: string;
 }
 
-export const signin = async (
+export const signin = async function (
   req: FastifyRequest<{ Body: SignupBody }>,
   res: FastifyReply,
-): Promise<Response | void> => {
+): Promise<Response | void> {
   try {
     const { email, password } = req.body;
 
@@ -38,6 +36,13 @@ export const signin = async (
       return;
     }
 
+    if (!user.isVerified) {
+      res
+        .status(HTTP.CODES.Unauthorized)
+        .send({ message: 'Authentication failed. User not verified.' });
+      return;
+    }
+
     const passwordMatch: boolean = await comparePasswords(
       password,
       user.password,
@@ -50,14 +55,38 @@ export const signin = async (
       return;
     }
 
-    const token: string = getToken({ email, id: user._id });
+    // TODO: Apply MFA verification process.env.ENABLE_MFA
+
+    const accessToken = this.jwt.access.sign({ email, id: user._id });
+    const refreshToken = this.jwt.refresh.sign({ email, id: user._id });
+
     // TODO use fastify plugin: const token = req.jwt.sign({ email, id: user._id });
 
     user.last_login = new Date();
     await user.save();
 
-    res.status(HTTP.CODES.Accepted).send({ token });
+    res.status(HTTP.CODES.Accepted).send({ accessToken, refreshToken });
   } catch (error) {
     res.send(error);
+  }
+};
+
+export const refreshToken = async function (
+  req: FastifyRequest<{ Body: SignupBody }>,
+  res: FastifyReply,
+): Promise<Response | void> {
+  try {
+    const refreshToken = 'req.body';
+    const decoded = await this.jwt.refresh.verify(refreshToken);
+    const newAccessToken = this.jwt.sign({
+      email: decoded.email,
+      id: decoded.id,
+    });
+
+    res.status(HTTP.CODES.Accepted).send({ accessToken: newAccessToken });
+  } catch (error) {
+    res
+      .status(HTTP.CODES.Unauthorized)
+      .send({ message: 'Invalid refresh token. Please try again.' });
   }
 };

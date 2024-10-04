@@ -64,6 +64,8 @@ export const updateUser = async (
     const user: ICoreUser | null = await User.findOne({ email }).select([
       '-deleted',
       '-_id',
+      '-password',
+      '-verificationToken',
     ]);
 
     if (!user) {
@@ -79,16 +81,15 @@ export const updateUser = async (
   }
 };
 
-export const getUser = async (
-  req: FastifyRequest<{ Body: SignupBody }>,
-  res: FastifyReply,
-) => {
+export const getUser = async (req: FastifyRequest, res: FastifyReply) => {
   try {
-    const { email } = req.body;
+    const { email } = req.user as { email: string };
 
     const user: ICoreUser | null = await User.findOne({ email }).select([
       '-deleted',
       '-_id',
+      '-password',
+      '-isVerified',
     ]);
 
     if (!user) {
@@ -103,10 +104,7 @@ export const getUser = async (
   }
 };
 
-export const verifyUser = async (
-  req: FastifyRequest<{ Body: SignupBody }>,
-  res: FastifyReply,
-) => {
+export const verifyUser = async (req: FastifyRequest, res: FastifyReply) => {
   const { verificationToken } = req.params as {
     [AUTH.PARAMS.VERIFY_USER_TOKEN]: string;
   };

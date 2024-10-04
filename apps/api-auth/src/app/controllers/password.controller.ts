@@ -12,7 +12,7 @@ import {
 import { ICoreUser } from '@barnie/interfaces';
 import User from '../models/user.model';
 
-// TODO: Store this in the interafaces library
+// TODO: Store this in the interfaces library
 interface SignupBody {
   email: string;
   password: string;

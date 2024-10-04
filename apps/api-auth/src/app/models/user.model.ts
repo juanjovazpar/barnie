@@ -18,7 +18,7 @@ const schema: Schema<ICoreUser> = new Schema(
     },
     password: {
       type: String,
-      required: [true, 'User is required'],
+      required: [true, 'Password is required'],
     },
     name: {
       type: String,
