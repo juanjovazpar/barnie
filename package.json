@@ -25,7 +25,8 @@
     "serve:menu": "nx serve menu",
     "serve:onboarding": "nx serve onboarding",
     "serve:order": "nx serve order",
-    "serve:payment": "nx serve payment"
+    "serve:payment": "nx serve payment",
+    "serve:design-system": "nx storybook design-system"
   },
   "private": true,
   "devDependencies": {
@@ -113,6 +114,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "6.11.2",
+    "tailwind": "^4.0.0",
     "tslib": "^2.3.0"
   }
 }
