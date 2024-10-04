@@ -105,11 +105,18 @@ export const getUser = async (req: FastifyRequest, res: FastifyReply) => {
 };
 
 export const verifyUser = async (req: FastifyRequest, res: FastifyReply) => {
-  const { verificationToken } = req.params as {
-    [AUTH.PARAMS.VERIFY_USER_TOKEN]: string;
-  };
-
   try {
+    const { verificationToken } = req.params as {
+      [AUTH.PARAMS.VERIFY_USER_TOKEN]: string;
+    };
+
+    if (!verificationToken) {
+      res
+        .status(HTTP.CODES.BadRequest)
+        .send({ message: 'Provide a verification token' });
+      return;
+    }
+
     const user = await User.findOne({ verificationToken });
 
     if (!user) {

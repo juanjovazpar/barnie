@@ -61,12 +61,12 @@ export const resetPassword = async (
   req: FastifyRequest<{ Body: SignupBody }>,
   res: FastifyReply,
 ): Promise<Response | void> => {
-  const { resetPasswordToken } = req.params as {
-    [AUTH.PARAMS.FORGOT_PASSWORD_TOKEN]: string;
-  };
-  const { password } = req.body;
-
   try {
+    const { resetPasswordToken } = req.params as {
+      [AUTH.PARAMS.FORGOT_PASSWORD_TOKEN]: string;
+    };
+    const { password } = req.body;
+
     const user = await User.findOne({ resetPasswordToken });
 
     if (!user) {
