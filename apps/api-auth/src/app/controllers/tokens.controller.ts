@@ -60,12 +60,13 @@ export const signin = async function (
     const accessToken = this.jwt.access.sign({ email, id: user._id });
     const refreshToken = this.jwt.refresh.sign({ email, id: user._id });
 
-    // TODO use fastify plugin: const token = req.jwt.sign({ email, id: user._id });
-
     user.last_login = new Date();
     await user.save();
 
-    res.status(HTTP.CODES.Accepted).send({ accessToken, refreshToken });
+    res.status(HTTP.CODES.Accepted).send({
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     res.send(error);
   }
