@@ -5,7 +5,7 @@ import { HTTP } from '@barnie/constants';
 
 export default fp(async function (fastify: FastifyInstance) {
   await fastify.register(ratelimit, {
-    max: 100,
+    max: 1000,
     ban: 1,
     timeWindow: '1 minute',
     allowList: [], // TODO: Add IPs to allow list from cluster pods

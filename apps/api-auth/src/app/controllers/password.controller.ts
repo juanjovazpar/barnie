@@ -5,7 +5,6 @@ import {
   comparePasswords,
   getHashedToken,
   hashPassword,
-  isValidEmail,
   isValidPassword,
   PASSWORD_RULES,
 } from '@barnie/helpers';
@@ -18,19 +17,12 @@ export const forgotPassword = async (
 ): Promise<Response | void> => {
   const { email } = req.body;
 
-  if (!isValidEmail(email)) {
-    res.status(HTTP.CODES.BadRequest).send({
-      message: 'This is not a valid email format.',
-    });
-    return;
-  }
-
   const user: ICoreUser | null = await User.findOne({ email });
 
   if (!user) {
     res
       .status(HTTP.CODES.Unauthorized)
-      .send({ message: 'Authentication failed. User not found.' });
+      .send({ message: 'Unauthorized. User not found.' });
     return;
   }
 

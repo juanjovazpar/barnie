@@ -50,7 +50,7 @@ export const signin = async function (
 
   // TODO: Apply MFA verification process.env.ENABLE_MFA
 
-  const accessToken = this.jwt.access.sign({ email, id: user._id });
+  const accessToken = this.jwt.sign({ email, id: user._id });
   const refreshToken = this.jwt.refresh.sign({ email, id: user._id });
 
   user.last_login = new Date();
@@ -66,7 +66,7 @@ export const refreshToken = async function (
   req: FastifyRequest<{ Body: ISignupBody }>,
   res: FastifyReply,
 ): Promise<Response | void> {
-  const refreshToken = 'req.body';
+  const refreshToken = 'req.body'; // TODO: Otain refresh token from cookie
   const decoded = await this.jwt.refresh.verify(refreshToken);
   const newAccessToken = this.jwt.sign({
     email: decoded.email,

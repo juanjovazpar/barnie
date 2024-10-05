@@ -14,19 +14,19 @@ const PARAMS = AUTH.PARAMS;
 export default async function (fastify: FastifyInstance) {
   fastify.route({
     method: HTTP.METHODS.POST,
-    // TODO: Implement schema validations in all routes
+    url: ROUTES.USERS,
     schema: {
       body: {
         type: 'object',
         required: ['password', 'email'],
       },
     },
-    url: ROUTES.USERS,
     handler: register,
   });
 
   fastify.route({
     method: HTTP.METHODS.GET,
+    url: ROUTES.VERIFY_USER,
     schema: {
       params: {
         required: [PARAMS.VERIFY_USER_TOKEN],
@@ -35,15 +35,26 @@ export default async function (fastify: FastifyInstance) {
         },
       },
     },
-    url: ROUTES.VERIFY_USER,
     handler: verifyUser,
   });
 
-  fastify.get(ROUTES.USERS, { preHandler: fastify['authenticate'] }, getUser);
+  fastify.route({
+    method: HTTP.METHODS.GET,
+    url: ROUTES.WHOAMI,
+    onRequest: fastify['authenticate'],
+    handler: getUser,
+  });
 
-  fastify.patch(
-    ROUTES.USERS,
-    { preHandler: fastify['authenticate'] },
-    updateUser,
-  );
+  fastify.route({
+    method: HTTP.METHODS.PATCH,
+    url: ROUTES.USERS,
+    schema: {
+      body: {
+        type: 'object',
+        required: ['name'],
+      },
+    },
+    onRequest: fastify['authenticate'],
+    handler: updateUser,
+  });
 }

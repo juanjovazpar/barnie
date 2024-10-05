@@ -9,6 +9,24 @@ import {
 import { AUTH, HTTP } from '@barnie/constants';
 import { ICoreUser, ISignupBody } from '@barnie/interfaces';
 import User from '../models/user.model';
+import { SELECTED_USER_FIELDS } from '../constants/hidden-fields';
+
+const getUserByProperty = async (
+  res: FastifyReply,
+  propertyName: string,
+  propertyValue: string,
+): Promise<ICoreUser> => {
+  const user: ICoreUser | null = await User.findOne({
+    [propertyName]: propertyValue,
+  }).select(SELECTED_USER_FIELDS);
+
+  if (!user) {
+    res.status(HTTP.CODES.NotFound).send({ message: 'User not found' });
+    return;
+  }
+
+  return user;
+};
 
 export const register = async (
   req: FastifyRequest<{ Body: ISignupBody }>,
@@ -43,47 +61,33 @@ export const register = async (
   res.status(HTTP.CODES.Created).send({ message: 'User created successfully' });
 };
 
+export const getUser = async (req: FastifyRequest, res: FastifyReply) => {
+  const { email } = req.user as { email: string };
+  const user = await getUserByProperty(res, 'email', email);
+
+  // TODO: Send user role and permissions
+  res.status(HTTP.CODES.Accepted).send({ user });
+};
+
 export const updateUser = async (
   req: FastifyRequest<{ Body: ISignupBody }>,
   res: FastifyReply,
 ) => {
-  const { email } = req.body;
-
-  const user: ICoreUser | null = await User.findOne({ email }).select([
-    '-deleted',
-    '-_id',
-    '-password',
-    '-verificationToken',
-    '-isVerified',
-  ]);
+  const { name } = req.body;
+  const { id } = req.user as { id: string };
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      $set: { name },
+    },
+    { new: true },
+  ).select(SELECTED_USER_FIELDS);
 
   if (!user) {
-    res.status(HTTP.CODES.NotFound).send({ message: 'User not found' });
+    res.status(HTTP.CODES.BadRequest).send({ message: 'Error updating user' });
     return;
   }
 
-  // TODO: Implement update user
-
-  res.status(HTTP.CODES.Accepted).send({ user });
-};
-
-export const getUser = async (req: FastifyRequest, res: FastifyReply) => {
-  const { email } = req.user as { email: string };
-
-  const user: ICoreUser | null = await User.findOne({ email }).select([
-    '-deleted',
-    '-_id',
-    '-password',
-    '-verificationToken',
-    '-isVerified',
-  ]);
-
-  if (!user) {
-    res.status(HTTP.CODES.NotFound).send({ message: 'User not found' });
-    return;
-  }
-
-  // TODO: Send user role and permissions
   res.status(HTTP.CODES.Accepted).send({ user });
 };
 
@@ -91,7 +95,6 @@ export const verifyUser = async (req: FastifyRequest, res: FastifyReply) => {
   const { [AUTH.PARAMS.VERIFY_USER_TOKEN]: verificationToken } = req.params as {
     [AUTH.PARAMS.VERIFY_USER_TOKEN]: string;
   };
-
   const user = await User.findOneAndUpdate(
     { verificationToken },
     {
