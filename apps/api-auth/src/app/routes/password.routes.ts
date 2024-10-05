@@ -1,6 +1,5 @@
 import { FastifyInstance } from 'fastify';
-
-import { AUTH } from '@barnie/constants';
+import { AUTH, HTTP } from '@barnie/constants';
 import {
   resetPassword,
   forgotPassword,
@@ -9,6 +8,15 @@ import {
 const ROUTES = AUTH.ROUTES;
 
 export default async function (fastify: FastifyInstance) {
-  fastify.post(ROUTES.REQUEST_FORGOT_PASSWORD, forgotPassword);
-  fastify.patch(ROUTES.SET_PASSWORD, resetPassword);
+  fastify.route({
+    method: HTTP.METHODS.POST,
+    url: ROUTES.REQUEST_FORGOT_PASSWORD,
+    handler: forgotPassword,
+  });
+
+  fastify.route({
+    method: HTTP.METHODS.PATCH,
+    url: ROUTES.SET_PASSWORD,
+    handler: resetPassword,
+  });
 }

@@ -4,9 +4,9 @@ import { MongoServerError } from 'mongodb';
 import mongoose from 'mongoose';
 
 export const errorHandler = async (
-  error: Error,
   _: FastifyRequest,
   res: FastifyReply,
+  error: Error,
 ) => {
   if (
     error instanceof mongoose.Error.ValidationError ||

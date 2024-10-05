@@ -7,136 +7,111 @@ import {
   hashPassword,
 } from '@barnie/helpers';
 import { AUTH, HTTP } from '@barnie/constants';
-import { ICoreUser } from '@barnie/interfaces';
+import { ICoreUser, ISignupBody } from '@barnie/interfaces';
 import User from '../models/user.model';
 
-interface SignupBody {
-  email: string;
-  password: string;
-}
-
 export const register = async (
-  req: FastifyRequest<{ Body: SignupBody }>,
+  req: FastifyRequest<{ Body: ISignupBody }>,
   res: FastifyReply,
 ): Promise<Response | void> => {
-  try {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    if (!isValidPassword(password)) {
-      res.status(HTTP.CODES.NotAcceptable).send({
-        message: `This is not a valid password format. ${PASSWORD_RULES}`,
-      });
-      return;
-    }
-
-    if (!isValidEmail(email)) {
-      res.status(HTTP.CODES.NotAcceptable).send({
-        message: 'This is not a valid email format.',
-      });
-      return;
-    }
-
-    // TODO: Check if user already exists
-
-    const hashedPassword = await hashPassword(password);
-    const newUser: ICoreUser = new User({
-      email,
-      password: hashedPassword,
+  if (!isValidPassword(password)) {
+    res.status(HTTP.CODES.NotAcceptable).send({
+      message: `This is not a valid password format. ${PASSWORD_RULES}`,
     });
-
-    await newUser.save();
-
-    res
-      .status(HTTP.CODES.Created)
-      .send({ message: 'User created successfully' });
-  } catch (error: unknown) {
-    res.send(error);
+    return;
   }
+
+  if (!isValidEmail(email)) {
+    res.status(HTTP.CODES.NotAcceptable).send({
+      message: 'This is not a valid email format.',
+    });
+    return;
+  }
+
+  // TODO: Check if user already exists
+
+  const hashedPassword = await hashPassword(password);
+  const newUser: ICoreUser = new User({
+    email,
+    password: hashedPassword,
+  });
+
+  await newUser.save();
+
+  res.status(HTTP.CODES.Created).send({ message: 'User created successfully' });
 };
 
 export const updateUser = async (
-  req: FastifyRequest<{ Body: SignupBody }>,
+  req: FastifyRequest<{ Body: ISignupBody }>,
   res: FastifyReply,
 ) => {
-  try {
-    const { email } = req.body;
+  const { email } = req.body;
 
-    const user: ICoreUser | null = await User.findOne({ email }).select([
-      '-deleted',
-      '-_id',
-      '-password',
-      '-verificationToken',
-    ]);
+  const user: ICoreUser | null = await User.findOne({ email }).select([
+    '-deleted',
+    '-_id',
+    '-password',
+    '-verificationToken',
+    '-isVerified',
+  ]);
 
-    if (!user) {
-      res.status(HTTP.CODES.NotFound).send({ message: 'User not found' });
-      return;
-    }
-
-    // TODO: Implement update user
-
-    res.status(HTTP.CODES.Accepted).send({ user });
-  } catch (error: unknown) {
-    res.send(error);
+  if (!user) {
+    res.status(HTTP.CODES.NotFound).send({ message: 'User not found' });
+    return;
   }
+
+  // TODO: Implement update user
+
+  res.status(HTTP.CODES.Accepted).send({ user });
 };
 
 export const getUser = async (req: FastifyRequest, res: FastifyReply) => {
-  try {
-    const { email } = req.user as { email: string };
+  const { email } = req.user as { email: string };
 
-    const user: ICoreUser | null = await User.findOne({ email }).select([
-      '-deleted',
-      '-_id',
-      '-password',
-      '-isVerified',
-    ]);
+  const user: ICoreUser | null = await User.findOne({ email }).select([
+    '-deleted',
+    '-_id',
+    '-password',
+    '-verificationToken',
+    '-isVerified',
+  ]);
 
-    if (!user) {
-      res.status(HTTP.CODES.NotFound).send({ message: 'User not found' });
-      return;
-    }
-
-    // TODO: Send user role and permissions
-    res.status(HTTP.CODES.Accepted).send({ user });
-  } catch (error: unknown) {
-    res.send(error);
+  if (!user) {
+    res.status(HTTP.CODES.NotFound).send({ message: 'User not found' });
+    return;
   }
+
+  // TODO: Send user role and permissions
+  res.status(HTTP.CODES.Accepted).send({ user });
 };
 
 export const verifyUser = async (req: FastifyRequest, res: FastifyReply) => {
-  try {
-    const { verificationToken } = req.params as {
-      [AUTH.PARAMS.VERIFY_USER_TOKEN]: string;
-    };
+  const { [AUTH.PARAMS.VERIFY_USER_TOKEN]: verificationToken } = req.params as {
+    [AUTH.PARAMS.VERIFY_USER_TOKEN]: string;
+  };
 
-    if (!verificationToken) {
-      res
-        .status(HTTP.CODES.BadRequest)
-        .send({ message: 'Provide a verification token' });
-      return;
-    }
+  const user = await User.findOneAndUpdate(
+    { verificationToken },
+    {
+      $set: { isVerified: true },
+      $unset: { verificationToken: null },
+    },
+    { new: true },
+  );
 
-    const user = await User.findOne({ verificationToken });
-
-    if (!user) {
-      res
-        .status(HTTP.CODES.Unauthorized)
-        .send({ message: 'Wrong verification token' });
-      return;
-    }
-
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    await user.save();
-
-    // TODO: Implement send verification mail
-    // await sendVerifiedUserMail(user.email);
-
+  if (!user) {
     res
-      .status(HTTP.CODES.Accepted)
-      .send({ message: 'Account verified successfully' });
-  } catch (error) {
-    res.send(error);
+      .status(HTTP.CODES.BadRequest)
+      .send({ message: 'Wrong verification token' });
+    return;
   }
+
+  // TODO: Implement send verification mail
+  // await sendVerifiedUserMail(user.email);
+
+  res
+    .status(HTTP.CODES.Accepted)
+    .send({ message: 'Account verified successfully' });
 };
