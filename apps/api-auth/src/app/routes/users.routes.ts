@@ -1,5 +1,4 @@
 import { FastifyInstance } from 'fastify';
-
 import { AUTH, HTTP } from '@barnie/constants';
 import {
   register,
@@ -7,6 +6,8 @@ import {
   updateUser,
   verifyUser,
 } from '../controllers/users.controller';
+import { userSchema, nameSchema } from '../schemas/user.schema';
+import { getValidatorHandler } from '../utils/validatorHandler.util';
 
 const ROUTES = AUTH.ROUTES;
 const PARAMS = AUTH.PARAMS;
@@ -18,9 +19,10 @@ export default async function (fastify: FastifyInstance) {
     schema: {
       body: {
         type: 'object',
-        required: ['password', 'email'],
+        required: ['password', 'email', 'name'],
       },
     },
+    preValidation: [getValidatorHandler(userSchema)],
     handler: register,
   });
 
@@ -54,6 +56,7 @@ export default async function (fastify: FastifyInstance) {
         required: ['name'],
       },
     },
+    preValidation: [getValidatorHandler(nameSchema)],
     onRequest: fastify['authenticate'],
     handler: updateUser,
   });

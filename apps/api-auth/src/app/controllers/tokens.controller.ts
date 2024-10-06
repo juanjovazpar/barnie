@@ -1,38 +1,23 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-import { isValidEmail, comparePasswords } from '@barnie/helpers';
+import { comparePasswords } from '@barnie/helpers';
 import { HTTP } from '@barnie/constants';
 
-import User from '../models/user.model';
-import { ICoreUser, ISignupBody } from '@barnie/interfaces';
+import { ICoreUser } from '@barnie/interfaces';
+import { getUserByProperty } from '../utils/findUser.util';
+import { TLoginInput } from '../schemas/user.schema';
 
 export const signin = async function (
-  req: FastifyRequest<{ Body: ISignupBody }>,
+  req: FastifyRequest<{ Body: TLoginInput }>,
   res: FastifyReply,
 ): Promise<Response | void> {
   const { email, password } = req.body;
+  const user: ICoreUser | null = await getUserByProperty('email', email);
 
-  // TODO: Abstract this to a service and use it in other controllers
-  if (!isValidEmail(email)) {
-    res.status(HTTP.CODES.BadRequest).send({
-      message: 'This is not a valid email format.',
+  if (!user.isVerified || user.deleted) {
+    res.status(HTTP.CODES.Unauthorized).send({
+      message: 'Authentication failed. User not verified or inactive.',
     });
-    return;
-  }
-
-  const user: ICoreUser | null = await User.findOne({ email });
-
-  if (!user) {
-    res
-      .status(HTTP.CODES.Unauthorized)
-      .send({ message: 'Authentication failed. User not found.' });
-    return;
-  }
-
-  if (!user.isVerified) {
-    res
-      .status(HTTP.CODES.Unauthorized)
-      .send({ message: 'Authentication failed. User not verified.' });
     return;
   }
 
@@ -49,9 +34,9 @@ export const signin = async function (
   }
 
   // TODO: Apply MFA verification process.env.ENABLE_MFA
-
-  const accessToken = this.jwt.sign({ email, id: user._id });
-  const refreshToken = this.jwt.refresh.sign({ email, id: user._id });
+  // TODO: Signing users with something different than their DB id?
+  const accessToken = this.jwt.sign({ sub: user._id, role: [] });
+  const refreshToken = this.jwt.refresh.sign({ sub: user._id });
 
   user.last_login = new Date();
   await user.save();
@@ -63,10 +48,10 @@ export const signin = async function (
 };
 
 export const refreshToken = async function (
-  req: FastifyRequest<{ Body: ISignupBody }>,
+  req: FastifyRequest,
   res: FastifyReply,
 ): Promise<Response | void> {
-  const refreshToken = 'req.body'; // TODO: Otain refresh token from cookie
+  const refreshToken = 'req.body'; // TODO: Obtain refresh token from cookie
   const decoded = await this.jwt.refresh.verify(refreshToken);
   const newAccessToken = this.jwt.sign({
     email: decoded.email,

@@ -22,7 +22,8 @@ const schema: Schema<ICoreUser> = new Schema(
     },
     name: {
       type: String,
-      default: 'Unknown',
+      trim: true,
+      required: [true, 'Name is required'],
     },
     isVerified: {
       type: Boolean,
@@ -57,6 +58,17 @@ schema.pre<ICoreUser>('save', async function (next) {
     next(error as CallbackError);
   }
 });
+
+schema.methods.toJSON = function () {
+  const obj = this.toObject();
+  return {
+    name: obj.name,
+    email: obj.email,
+    last_login: obj.last_login,
+    updatedAt: obj.updatedAt,
+    createdAt: obj.createdAt,
+  };
+};
 
 const User: Model<ICoreUser> = mongoose.model<ICoreUser>('User', schema);
 

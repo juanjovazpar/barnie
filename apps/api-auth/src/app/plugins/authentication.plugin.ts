@@ -6,7 +6,7 @@ import jwt from '@fastify/jwt';
 export default fp(async function (fastify: FastifyInstance) {
   await fastify.register(jwt, {
     secret: process.env.JWT_ACCESS_SECRET,
-    sign: { expiresIn: '1d' },
+    sign: { expiresIn: '2h' },
   });
 
   await fastify.register(jwt, {

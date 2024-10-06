@@ -4,6 +4,8 @@ import {
   resetPassword,
   forgotPassword,
 } from '../controllers/password.controller';
+import { emailSchema, passwordSchema } from '../schemas/user.schema';
+import { getValidatorHandler } from '../utils/validatorHandler.util';
 
 const ROUTES = AUTH.ROUTES;
 const PARAMS = AUTH.PARAMS;
@@ -18,6 +20,7 @@ export default async function (fastify: FastifyInstance) {
         required: ['email'],
       },
     },
+    preValidation: [getValidatorHandler(emailSchema)],
     handler: forgotPassword,
   });
 
@@ -36,6 +39,7 @@ export default async function (fastify: FastifyInstance) {
         required: ['password'],
       },
     },
+    preValidation: [getValidatorHandler(passwordSchema)],
     handler: resetPassword,
   });
 }

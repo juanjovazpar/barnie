@@ -5,19 +5,25 @@ import {
   comparePasswords,
   getHashedToken,
   hashPassword,
-  isValidPassword,
-  PASSWORD_RULES,
 } from '@barnie/helpers';
-import { ICoreUser, ISignupBody } from '@barnie/interfaces';
+import { ICoreUser } from '@barnie/interfaces';
 import User from '../models/user.model';
+import { getUserByProperty } from '../utils/findUser.util';
+import { TEmailInput, TPasswordInput } from '../schemas/user.schema';
 
 export const forgotPassword = async (
-  req: FastifyRequest<{ Body: ISignupBody }>,
+  req: FastifyRequest<{ Body: TEmailInput }>,
   res: FastifyReply,
 ): Promise<Response | void> => {
   const { email } = req.body;
-
-  const user: ICoreUser | null = await User.findOne({ email });
+  const resetPasswordToken = await getHashedToken(60 * 60 * 1000);
+  const user: ICoreUser | null = await User.findOneAndUpdate(
+    { email },
+    {
+      $set: { resetPasswordToken },
+    },
+    { new: true },
+  );
 
   if (!user) {
     res
@@ -25,11 +31,6 @@ export const forgotPassword = async (
       .send({ message: 'Unauthorized. User not found.' });
     return;
   }
-
-  const hashedResetPasswordToken = await getHashedToken(60 * 60 * 1000);
-
-  user.resetPasswordToken = hashedResetPasswordToken;
-  await user.save();
 
   // TODO: Implement send reset password mail
   // await sendResetPasswordMail(user.email, hashedResetPasswordToken);
@@ -40,30 +41,18 @@ export const forgotPassword = async (
 };
 
 export const resetPassword = async (
-  req: FastifyRequest<{ Body: ISignupBody }>,
+  req: FastifyRequest<{ Body: TPasswordInput }>,
   res: FastifyReply,
 ): Promise<Response | void> => {
+  const { password } = req.body;
   const { [AUTH.PARAMS.FORGOT_PASSWORD_TOKEN]: resetPasswordToken } =
     req.params as {
       [AUTH.PARAMS.FORGOT_PASSWORD_TOKEN]: string;
     };
-  const { password } = req.body;
-
-  const user = await User.findOne({ resetPasswordToken });
-
-  if (!user) {
-    res
-      .status(HTTP.CODES.Unauthorized)
-      .send({ message: 'Invalid reset password token' });
-    return;
-  }
-
-  if (!password || !isValidPassword(password)) {
-    res
-      .send(HTTP.CODES.BadRequest)
-      .send({ message: `Invalid password format. ${PASSWORD_RULES}` });
-    return;
-  }
+  const user: ICoreUser | null = await getUserByProperty(
+    'resetPasswordToken',
+    resetPasswordToken,
+  );
 
   const passwordMatch: boolean = await comparePasswords(
     password,
@@ -72,8 +61,8 @@ export const resetPassword = async (
 
   if (passwordMatch) {
     res
-      .send(HTTP.CODES.Unauthorized)
-      .send({ message: 'You must define a password never used before.' });
+      .send(HTTP.CODES.BadRequest)
+      .send({ message: 'You must define a password not used before.' });
     return;
   }
 
