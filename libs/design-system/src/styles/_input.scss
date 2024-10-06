@@ -1,0 +1,87 @@
+@mixin input-size($padding-y, $padding-x, $font-size, $border-width-class) {
+  @apply py-#{$padding-y} px-#{$padding-x} text-#{$font-size} #{$border-width-class};
+}
+
+@mixin input-states {
+  &:not(.correct):not(.warning):not(.error):not(:disabled) {
+    &:hover,
+    &:focus,
+    &:active {
+      @apply border-gray-900;
+    }
+  }
+
+  &:disabled {
+    @apply bg-gray-100 text-gray-600 cursor-not-allowed opacity-50;
+  }
+}
+
+@mixin status-circle-pseudo {
+  &:before,
+  &:after {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@mixin status-circle($color, $icon) {
+  &:before {
+    content: '';
+    border-radius: 50%;
+    background-color: #{$color};
+  }
+  &:after {
+    content: $icon;
+    font-size: 12px;
+    color: white;
+    text-align: center;
+    line-height: 16px;
+  }
+}
+
+.input {
+  @apply text-gray-700 shadow appearance-none border rounded leading-tight transition-all relative outline-none;
+
+  @include input-size(2, 4, base, border);
+
+  &.correct {
+    @include status-circle('rgb(34,197,94)', '✔');
+    @include status-circle-pseudo;
+
+    &:not(:disabled) {
+      @apply border-green-500;
+    }
+  }
+  &.warning {
+    @include status-circle('rgb(245,158,11)', '⚠');
+    @include status-circle-pseudo;
+
+    &:not(:disabled) {
+      @apply border-orange-500;
+    }
+  }
+  &.error {
+    @include status-circle('rgb(239,68,68)', '✖');
+    @include status-circle-pseudo;
+
+    &:not(:disabled) {
+      @apply border-red-500;
+    }
+  }
+
+  &-xsmall {
+    @include input-size(1, 2, xs, border);
+  }
+  &-small {
+    @include input-size(1, 2, sm, border);
+  }
+  &-large {
+    @include input-size(3, 6, lg, border-2);
+  }
+
+  @include input-states;
+}

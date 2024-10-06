@@ -3,11 +3,13 @@ export const Button = ({
   onClick,
   type = 'button',
   disabled = false,
+  className = '',
+  size = '',
   ...props
 }) => {
   return (
     <button
-      className="bg-blue-500 text-white py-2 px-4 rounded"
+      className={`btn ${className} ${size}`}
       type={type}
       onClick={onClick}
       disabled={disabled}

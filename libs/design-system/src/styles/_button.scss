@@ -1,0 +1,53 @@
+@mixin button-variant($bg-color) {
+  @apply bg-#{$bg-color};
+}
+
+@mixin button-size($padding-y, $padding-x, $font-size) {
+  @apply py-#{$padding-y} px-#{$padding-x} text-#{$font-size};
+}
+
+@mixin button-states {
+  &:hover {
+    @apply brightness-[105%];
+  }
+  &:active {
+    @apply brightness-[95%];
+  }
+  &:focus {
+    @apply ring-2 ring-blue-400 outline-none;
+  }
+  &:disabled {
+    @apply bg-gray-400 text-gray-200 cursor-not-allowed opacity-50;
+  }
+}
+
+.btn {
+  @apply font-bold rounded text-white transition-all;
+  @include button-size(2, 4, base);
+
+  &-xsmall {
+    @include button-size(1, 2, xs);
+  }
+
+  &-small {
+    @include button-size(1, 2, sm);
+  }
+
+  &-large {
+    @include button-size(3, 6, lg);
+  }
+
+  &-primary {
+    @include button-variant(primary);
+  }
+
+  &-secondary {
+    @include button-variant(secondary);
+  }
+
+  &-tertiary {
+    @include button-variant(tertiary);
+  }
+
+  @include button-states;
+}

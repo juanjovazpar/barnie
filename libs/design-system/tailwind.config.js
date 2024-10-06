@@ -1,16 +1,10 @@
-import colors from './src/styles/config/color';
-import spacing from './src/styles/config/spacing';
-import fontFamily from './src/styles/config/typography';
+import extend from './src/styles/config-tailwind';
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.tsx'],
   theme: {
-    extend: {
-      colors,
-      spacing,
-      fontFamily,
-    },
+    extend,
   },
   plugins: [],
 };
