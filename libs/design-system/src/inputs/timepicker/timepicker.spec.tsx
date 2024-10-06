@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 
-import { Input } from './input';
+import { TimePicker } from './timepicker';
 
-describe('Input', () => {
+describe('TimePicker', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<Input />);
+    const { baseElement } = render(<TimePicker />);
     expect(baseElement).toBeTruthy();
   });
 });

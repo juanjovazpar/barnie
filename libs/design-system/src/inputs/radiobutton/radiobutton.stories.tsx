@@ -1,9 +1,9 @@
 import type { Meta } from '@storybook/react';
-import { Checkbox } from './checkbox';
+import { RadioButton } from './radiobutton';
 
-const meta: Meta<typeof Checkbox> = {
-  component: Checkbox,
-  title: 'Inputs/Checkbox',
+const meta: Meta<typeof RadioButton> = {
+  component: RadioButton,
+  title: 'Inputs/RadioButton',
 };
 export default meta;
 

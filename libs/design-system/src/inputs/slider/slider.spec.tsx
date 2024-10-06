@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 
-import DesignSystem from './design-system';
+import { Slider } from './slider';
 
-describe('DesignSystem', () => {
+describe('Slider', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<DesignSystem />);
+    const { baseElement } = render(<Slider />);
     expect(baseElement).toBeTruthy();
   });
 });

@@ -1,9 +1,9 @@
 import type { Meta } from '@storybook/react';
-import { Checkbox } from './checkbox';
+import { TimePicker } from './timepicker';
 
-const meta: Meta<typeof Checkbox> = {
-  component: Checkbox,
-  title: 'Inputs/Checkbox',
+const meta: Meta<typeof TimePicker> = {
+  component: TimePicker,
+  title: 'Inputs/TimePicker',
 };
 export default meta;
 

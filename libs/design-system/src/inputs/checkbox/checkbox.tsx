@@ -1,4 +1,4 @@
-export const Checkbox = ({ label, checked, onChange, ...props }) => (
+export const Checkbox = ({ label, error, checked, onChange, ...props }) => (
   <div>
     <label>
       <input
@@ -9,5 +9,10 @@ export const Checkbox = ({ label, checked, onChange, ...props }) => (
       ></input>
       {label}
     </label>
+    {error && (
+      <p style={{ color: 'red', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+        {error}
+      </p>
+    )}
   </div>
 );

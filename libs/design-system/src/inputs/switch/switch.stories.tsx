@@ -1,9 +1,9 @@
 import type { Meta } from '@storybook/react';
-import { Checkbox } from './checkbox';
+import { Switch } from './switch';
 
-const meta: Meta<typeof Checkbox> = {
-  component: Checkbox,
-  title: 'Inputs/Checkbox',
+const meta: Meta<typeof Switch> = {
+  component: Switch,
+  title: 'Inputs/Switch',
 };
 export default meta;
 
@@ -11,5 +11,6 @@ export const Primary = {
   args: {
     label: 'Label',
     error: 'Error',
+    checked: true,
   },
 };

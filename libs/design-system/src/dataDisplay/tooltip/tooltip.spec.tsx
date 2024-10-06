@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 
-import { Input } from './input';
+import { Tooltip } from './tooltip';
 
-describe('Input', () => {
+describe('Tooltip', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<Input />);
+    const { baseElement } = render(<Tooltip />);
     expect(baseElement).toBeTruthy();
   });
 });

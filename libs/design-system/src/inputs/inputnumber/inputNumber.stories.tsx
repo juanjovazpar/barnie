@@ -1,9 +1,9 @@
 import type { Meta } from '@storybook/react';
-import { Checkbox } from './checkbox';
+import { InputNumber } from './inputNumber';
 
-const meta: Meta<typeof Checkbox> = {
-  component: Checkbox,
-  title: 'Inputs/Checkbox',
+const meta: Meta<typeof InputNumber> = {
+  component: InputNumber,
+  title: 'Inputs/InputNumber',
 };
 export default meta;
 

@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 
-import { Input } from './input';
+import { DatePicker } from './datepicker';
 
-describe('Input', () => {
+describe('DatePicker', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<Input />);
+    const { baseElement } = render(<DatePicker />);
     expect(baseElement).toBeTruthy();
   });
 });
