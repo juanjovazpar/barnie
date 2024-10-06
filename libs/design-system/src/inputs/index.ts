@@ -6,3 +6,4 @@ export * from './datepicker';
 export * from './slider';
 export * from './inputnumber';
 export * from './switch';
+export * from './textarea';

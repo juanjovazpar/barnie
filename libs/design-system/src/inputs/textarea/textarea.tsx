@@ -1,4 +1,4 @@
-export const Input = ({
+export const Textarea = ({
   label,
   error,
   value,
@@ -14,15 +14,14 @@ export const Input = ({
 }) => (
   <div>
     {label && <label>{label}</label>}
-    <input
-      type={type || 'text'}
+    <textarea
       value={value}
       onChange={onChange}
       placeholder={placeholder}
       disabled={disabled}
       className={`input w-full ${className} ${size} ${error ? 'error' : status} ${filled ? 'filled' : ''}`}
       {...props}
-    ></input>
+    ></textarea>
     {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
   </div>
 );

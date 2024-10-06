@@ -1,10 +1,19 @@
-export const Checkbox = ({ label, error, checked, onChange, ...props }) => (
+export const Checkbox = ({
+  label,
+  error,
+  checked,
+  onChange,
+  disabled,
+  ...props
+}) => (
   <div>
     <label>
       <input
         type="checkbox"
         checked={checked}
         onChange={onChange}
+        disabled={disabled}
+        className="mr-2"
         {...props}
       ></input>
       {label}

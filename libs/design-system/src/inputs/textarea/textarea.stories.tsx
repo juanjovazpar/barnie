@@ -1,9 +1,9 @@
 import type { Meta } from '@storybook/react';
-import { InputNumber } from './inputNumber';
+import { Textarea } from './textarea';
 
-const meta: Meta<typeof InputNumber> = {
-  component: InputNumber,
-  title: 'Inputs/InputNumber',
+const meta: Meta<typeof Textarea> = {
+  component: Textarea,
+  title: 'Inputs/Textarea',
   argTypes: {
     disabled: { control: 'boolean' },
     filled: { control: 'boolean' },

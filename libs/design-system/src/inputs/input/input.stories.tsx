@@ -6,6 +6,7 @@ const meta: Meta<typeof Input> = {
   title: 'Inputs/Input',
   argTypes: {
     disabled: { control: 'boolean' },
+    filled: { control: 'boolean' },
     size: {
       control: {
         type: 'select',
@@ -27,9 +28,10 @@ export default meta;
 export const Primary = {
   args: {
     label: 'This is a label',
-    error: 'Error',
+    error: '',
     placeholder: 'This is a placeholder',
     disabled: false,
+    filled: false,
     size: '',
     status: '',
   },
