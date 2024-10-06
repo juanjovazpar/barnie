@@ -1,8 +1,8 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyRequest } from 'fastify';
 import { lookup } from 'geoip-lite';
 import { IRequestDetails } from '../interfaces/request-details.interface';
 
-export const requestLogger = async (req: FastifyRequest, _: FastifyReply) => {
+export const requestLogger = async (req: FastifyRequest) => {
   const ip = req.headers['x-forwarded-for'] || req.ip;
   const geo = lookup(ip as string);
   const referrer = Array.isArray(req.headers['referer'])
@@ -13,15 +13,16 @@ export const requestLogger = async (req: FastifyRequest, _: FastifyReply) => {
     userAgent: req.headers['user-agent'] || '',
     referrer: referrer as string,
     geoLocation: geo ? `${geo.city}, ${geo.region}, ${geo.country}` : 'N/A',
-    timestamp: new Date(),
     deviceType: /mobile|tablet/i.test(req.headers['user-agent'] || '')
       ? 'Mobile'
       : 'Desktop',
     language: req.headers['accept-language'] || '',
+    url: req.raw.url,
+    method: req.method,
+    body: req.body,
   };
 
   (req as any).requestDetails = requestDetails;
 
-  // TODO: Store calls in DB
   console.log('RequestDetails:', requestDetails);
 };

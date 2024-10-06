@@ -8,4 +8,5 @@ export interface ICoreUser extends Document {
   verificationToken?: string;
   resetPasswordToken?: string;
   last_login?: Date;
+  deleted?: Date;
 }

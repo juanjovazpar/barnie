@@ -3,7 +3,9 @@ export interface IRequestDetails {
   userAgent: string;
   referrer: string;
   geoLocation: string;
-  timestamp: Date;
   deviceType: string;
   language: string;
+  url?: string;
+  method?: string;
+  body?: object | undefined | unknown;
 }

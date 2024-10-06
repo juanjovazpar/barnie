@@ -2,13 +2,18 @@ import { HTTP } from '../constants';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { MongoServerError } from 'mongodb';
 import mongoose from 'mongoose';
+import { ZodError } from 'zod';
 
 export const errorHandler = async (
   _: FastifyRequest,
   res: FastifyReply,
   error: Error,
 ) => {
-  if (
+  if (error instanceof ZodError) {
+    res
+      .status(HTTP.CODES.BadRequest)
+      .send({ message: 'Validaton failed', error: error.errors });
+  } else if (
     error instanceof mongoose.Error.ValidationError ||
     (error as MongoServerError).code === 11000
   ) {
