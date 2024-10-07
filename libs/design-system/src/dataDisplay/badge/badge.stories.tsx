@@ -9,6 +9,6 @@ export default meta;
 
 export const Primary = {
   args: {
-    label: 'Alert',
+    label: 'Badge',
   },
 };
