@@ -9,7 +9,7 @@ const meta: Meta<typeof Progressbar> = {
       control: {
         type: 'select',
       },
-      options: ['none', 'inside', 'top', 'left'],
+      options: ['none', 'inside', 'top', 'left', 'right'],
       defaultValue: '',
     },
     rounded: { control: 'boolean' },

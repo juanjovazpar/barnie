@@ -10,14 +10,19 @@ export const Progressbar = ({
     {label && <label>{label}</label>}
     <div
       className={
-        showValue === 'left'
+        showValue === 'left' || showValue === 'right'
           ? 'flex items-center gap-x-3 whitespace-nowrap'
           : ''
       }
     >
+      {showValue === 'right' && (
+        <div className="w-10 text-start">
+          <span className="progressbar-side-tag">{`${progress}%`}</span>
+        </div>
+      )}
       {showValue === 'top' && (
         <div
-          className={`progressbar-floating-tag inline-block mb-2`}
+          className={`progressbar-floating-tag`}
           style={{ marginLeft: `calc(${progress}% - 1.25rem)` }}
         >
           {`${progress}%`}
@@ -38,7 +43,7 @@ export const Progressbar = ({
       </div>
       {showValue === 'left' && (
         <div className="w-10 text-end">
-          <span className="text-sm text-gray-800 dark:text-white">{`${progress}%`}</span>
+          <span className="progressbar-aside-tag">{`${progress}%`}</span>
         </div>
       )}
     </div>

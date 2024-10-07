@@ -21,5 +21,6 @@ export const Primary = {
     type: 'info',
     message: 'This is a message',
     description: 'This is a description',
+    onClose: () => alert('Closed!'),
   },
 };

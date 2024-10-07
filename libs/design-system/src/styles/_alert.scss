@@ -3,26 +3,26 @@
 }
 
 .alert {
-  @apply border-l-4 p-4 rounded-md flex justify-between items-center;
-  @include alert-variant(blue-100, blue-400);
-
-  &-info {
-    @include alert-variant(blue-100, blue-400);
-  }
-
-  &-success {
-    @include alert-variant(green-100, green-400);
-  }
-
-  &-warning {
-    @include alert-variant(yellow-100, yellow-400);
-  }
-
-  &-error {
-    @include alert-variant(red-100, red-400);
-  }
+  @apply border p-4 rounded-md flex justify-between items-center gap-x-3 whitespace-nowrap;
 
   &-close {
     @apply font-bold px-2 focus:outline-none cursor-pointer text-gray-400 text-lg;
+  }
+
+  &,
+  &-info {
+    @include alert-variant(blue-50, blue-400);
+  }
+
+  &-success {
+    @include alert-variant(green-50, green-400);
+  }
+
+  &-warning {
+    @include alert-variant(yellow-50, yellow-400);
+  }
+
+  &-error {
+    @include alert-variant(red-50, red-400);
   }
 }
