@@ -9,6 +9,7 @@
 .badge {
   @apply inline-flex items-center gap-x-1.5 mx-1 text-xs font-medium;
   @include badge-size(3, 1.5, sm);
+  @include badge-color('blue');
 
   &,
   &-square {
