@@ -7,6 +7,7 @@
 }
 
 @mixin button-states {
+  // TODO: Use :hover :disabled syntax from Tailwind to accomplish states
   &:hover {
     @apply brightness-[105%];
   }

@@ -13,7 +13,7 @@
 }
 
 .progressbar {
-  @apply w-full bg-gray-200 dark:bg-neutral-700;
+  @apply w-full bg-gray-200;
   @include bar-size(5, xs);
   @include bar-variant(blue-500);
 
@@ -31,11 +31,11 @@
   }
 
   &-floating-tag {
-    @apply py-0.5 px-1.5 inline-block mb-2 bg-blue-50 border border-blue-200 text-xs font-medium text-blue-600 rounded-lg dark:bg-blue-800/30 dark:border-blue-800 dark:text-blue-500;
+    @apply py-0.5 px-1.5 inline-block mb-2 bg-blue-50 border border-blue-200 text-xs font-medium text-blue-600 rounded-lg;
   }
 
   &-aside-tag {
-    @apply text-sm text-gray-800 dark:text-white;
+    @apply text-sm text-gray-800;
   }
 
   &-xsmall {
