@@ -1,3 +1,43 @@
+/**
+ * Button Component
+ *
+ * The Button component is a customizable button element that can trigger actions when clicked.
+ * It supports different types (button, submit, reset) and can be disabled.
+ *
+ * Props:
+ *
+ * - `label` (string): The text to display on the button.
+ * - `onClick` (function): Callback function to be called when the button is clicked.
+ * - `type` (TButtonType, optional): The type of button, which can be "button", "submit", or "reset". Defaults to "button".
+ * - `disabled` (boolean, optional): If true, the button is disabled and cannot be interacted with. Defaults to false.
+ * - `className` (string, optional): Additional CSS classes to apply to the button.
+ * - `size` (string, optional): CSS class that determines the size of the button.
+ * - `[key: string]: unknown`: Allows additional properties to be passed to the button element.
+ *
+ * Usage:
+ *
+ * ```jsx
+ * <Button
+ *   label="Click Me"
+ *   onClick={() => console.log('Button clicked!')}
+ *   type="submit"
+ *   className="primary"
+ * />
+ * ```
+ */
+
+export type TButtonType = 'button' | 'submit' | 'reset';
+
+export interface IButtonProps {
+  label: string;
+  onClick: () => void;
+  type?: TButtonType;
+  disabled?: boolean;
+  className?: string;
+  size?: string;
+  [key: string]: unknown;
+}
+
 export const Button = ({
   label,
   onClick,
@@ -6,7 +46,7 @@ export const Button = ({
   className = '',
   size = '',
   ...props
-}) => {
+}: IButtonProps) => {
   return (
     <button
       className={`btn ${className} ${size}`}

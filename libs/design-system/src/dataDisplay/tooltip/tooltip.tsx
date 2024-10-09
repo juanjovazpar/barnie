@@ -14,20 +14,28 @@ import { useState } from 'react';
  * @param {string} text - The text to display inside the tooltip.
  * @param {'top' | 'bottom' | 'left' | 'right'} [position='top'] - Position of the tooltip relative to the target element.
  * @param {React.CSSProperties} [style] - Additional styles for the tooltip.
- * @param {object} [props] - Any other props that can be passed to the tooltip container.
  *
  * @example
  *   <Tooltip text="Click here for more information" position="top">
  *      <button style={{ padding: '10px 20px' }}>Button with Tooltip</button>
  *   </Tooltip>
  */
+
+export type TTooltipPosition = 'top' | 'bottom' | 'left' | 'right';
+interface ITooltipProps {
+  children: React.ReactNode;
+  text: string;
+  position?: TTooltipPosition;
+  style?: React.CSSProperties;
+}
+
 export const Tooltip = ({
   children,
   text,
   position = 'top',
   style,
   ...props
-}) => {
+}: ITooltipProps) => {
   const [visible, setVisible] = useState(false);
 
   const showTooltip = () => setVisible(true);
@@ -80,7 +88,7 @@ export const Tooltip = ({
   };
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }} {...props}>
+    <div style={{ position: 'relative', display: 'inline-block' }}>
       <div onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
         {children}
       </div>

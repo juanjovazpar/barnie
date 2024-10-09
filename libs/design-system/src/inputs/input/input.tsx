@@ -7,7 +7,7 @@ export const Input = ({
   placeholder,
   disabled = false,
   className = '',
-  size = '', // TODO: Think on just passing the sixe instead of full className
+  size = '', // TODO: Think on just passing the size instead of full className
   status = '', // 'correct', 'warning', 'error'
   onChange,
   ...props

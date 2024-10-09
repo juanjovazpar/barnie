@@ -1,3 +1,39 @@
+/**
+ * Timeline Component
+ *
+ * The Timeline component displays a structured timeline of events or actions. Each timeline
+ * slot can contain multiple items, each with a title, description, and an optional button.
+ *
+ * Props:
+ *
+ * - `slots` (ITimelineSlot[]): An array of timeline slots, each containing a title and an array of items.
+ * - `hoverable` (boolean): A flag that determines if the timeline items should have a hover effect.
+ *
+ * Usage:
+ *
+ * ```jsx
+ * const timelineData = [
+ *   {
+ *     title: "Phase 1",
+ *     items: [
+ *       {
+ *         title: "Step 1",
+ *         description: "Description of step 1",
+ *         button: {
+ *           title: "Learn More",
+ *           logo: "path/to/logo.png",
+ *         },
+ *       },
+ *       // More items...
+ *     ],
+ *   },
+ *   // More slots...
+ * ];
+ *
+ * <Timeline slots={timelineData} hoverable={true} />
+ * ```
+ */
+
 export interface ITimelineItem {
   title: string;
   description: string;
@@ -12,14 +48,12 @@ export interface ITimelineSlot {
   items: ITimelineItem[];
 }
 
-// TODO: Create interfaces for componentes Properties
-export const Timeline = ({
-  slots,
-  hoverable,
-}: {
+export interface ITimelineProps {
   slots: ITimelineSlot[];
   hoverable: boolean;
-}) => (
+}
+
+export const Timeline = ({ slots, hoverable }: ITimelineProps) => (
   <div className="timeline">
     {slots?.map((slot) => (
       <>

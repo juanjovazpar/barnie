@@ -1,12 +1,18 @@
+export interface ICardProps {
+  title: string;
+  description: string;
+  image?: string;
+  actions?: React.ReactNode;
+  style?: React.CSSProperties;
+}
+
 export const Card = ({
   title,
   description,
   image,
   actions,
   style,
-  className,
-  ...props
-}) => {
+}: ICardProps) => {
   return (
     <div
       style={{
@@ -16,8 +22,6 @@ export const Card = ({
         overflow: 'hidden',
         ...style,
       }}
-      className={className}
-      {...props}
     >
       {image && (
         <img
