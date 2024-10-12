@@ -6,7 +6,7 @@ export default async function (fastify: FastifyInstance) {
     method: HTTP.METHODS.GET,
     url: '/',
     handler: async () => ({
-      message: 'Hey, there. I am alive!',
+      message: 'Hey, there. I am Auth API!',
     }),
   });
 }

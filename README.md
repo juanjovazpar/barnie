@@ -200,6 +200,21 @@ docker build -t api-core -f ./apps/api-core/Dockerfile ./
 
 ## List projects
 
-`````
+```
 nx show projects
-`````
+```
+
+# Docker Images
+
+Build Docker image from root directory:
+
+```
+docker build -t <IMAGE-NAME> -f apps/api-auth/Dockerfile .
+```
+
+Build container:
+
+```
+docker run -d -p 3000:3000 --name <CONTAINER_NAME> <IMAGE_NAME> --env-file .env
+
+```

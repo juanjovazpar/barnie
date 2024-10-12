@@ -1,8 +1,10 @@
 import Fastify from 'fastify';
 import { app } from './app/app';
 
-const host = process.env.HOST ?? 'localhost';
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const host = process.env.HOST ?? '0.0.0.0';
+const port = process.env.API_AUTH_PORT
+  ? Number(process.env.API_AUTH_PORT)
+  : 3000;
 
 const server = Fastify({
   logger: true,

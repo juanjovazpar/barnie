@@ -2,7 +2,9 @@ import Fastify from 'fastify';
 import { app } from './app/app';
 
 const host = process.env.HOST ?? '0.0.0.0';
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const port = process.env.API_CORE_PORT
+  ? Number(process.env.API_CORE_PORT)
+  : 3000;
 
 // Instantiate Fastify with some config
 const server = Fastify({

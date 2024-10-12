@@ -24,7 +24,7 @@ export const register = async (
 };
 
 // TODO: Set interface for authenticated request
-export const getUser = async (req: FastifyRequest, res: FastifyReply) => {
+export const getUser = async (req: { user: unknown }, res: FastifyReply) => {
   const { sub } = req.user as { sub: string };
   const user: ICoreUser | null = await getUserByProperty('_id', sub);
 
@@ -32,7 +32,7 @@ export const getUser = async (req: FastifyRequest, res: FastifyReply) => {
 };
 
 export const updateUser = async (
-  req: FastifyRequest<{ Body: TNameInput }>,
+  req: { body: TNameInput; user: unknown },
   res: FastifyReply,
 ) => {
   const { name } = req.body;
