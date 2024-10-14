@@ -20,12 +20,18 @@ RUN npx nx reset
 RUN npm run build:${APP_NAME} -- --prod --skip-nx-cache --verbose
 
 # Stage 2: Serve production build
-FROM nginx:1.23-alpine AS production
+FROM node:20-alpine AS production
+
+WORKDIR /app
 
 ENV APP_NAME=${APP_NAME}
 
-COPY --from=builder /app/dist/apps/${APP_NAME}/* /usr/share/nginx/html
+COPY package*.json ./
 
-EXPOSE 80
+RUN npm cache clean --force && npm install --production
 
-CMD ["nginx", "-g", "daemon off;"]
+COPY --from=builder /app/dist/apps/${APP_NAME} ./apps/${APP_NAME}
+
+EXPOSE 3000
+
+CMD ["/bin/sh", "-c", "node apps/${APP_NAME}/main.js"]

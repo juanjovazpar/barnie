@@ -16,6 +16,15 @@
         "styles": [],
         "scripts": []
       }
+    },
+    "serve": {
+      "executor": "@nrwl/next:dev-server",
+      "options": {
+        "port": 3000,
+        "host": "localhost",
+        "root": "apps/core-backoffice",
+        "public": "apps/core-backoffice/public"
+      }
     }
   }
 }

@@ -1,11 +1,11 @@
-version: '3.9'
+name: 'barnie-dev'
 services:
-  db-auth:
+  db:
     image: mongo:latest
     ports:
-      - '${DB_AUTH_PORT}:27017'
+      - '27017:27017'
     volumes:
-      - db-auth:/data/db
+      - db-data:/data/db
 
   api-auth:
     build:
@@ -16,18 +16,15 @@ services:
     ports:
       - '${API_AUTH_PORT}:3000'
     environment:
-      NODE_ENV: production
-      DB_AUTH_HOST: mongodb://db-auth:27017/api-auth
+      NODE_ENV: development
+      DB_AUTH_HOST: mongodb://db:27017/api-auth
       APP_NAME: api-auth
-    depends_on:
-      - db-auth
-
-  db-leads:
-    image: mongo:latest
-    ports:
-      - '${DB_LEADS_PORT}:27017'
     volumes:
-      - db-leads:/data/db
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - db
 
   api-leads:
     build:
@@ -38,11 +35,15 @@ services:
     ports:
       - '${API_LEADS_PORT}:3000'
     environment:
-      NODE_ENV: production
-      DB_LEADS_HOST: mongodb://db-leads:27017/api-leads
+      NODE_ENV: development
+      DB_LEADS_HOST: mongodb://db:27017/api-leads
       APP_NAME: api-leads
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
-      - db-leads
+      - db
       - api-auth
 
   leads-backoffice:
@@ -54,30 +55,31 @@ services:
     ports:
       - '${LEADS_BACKOFFICE_PORT}:3000'
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       APP_NAME: leads-backoffice
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
       - api-leads
 
   onboarding:
     build:
       context: .
-      dockerfile: Dockerfile.react.base
+      dockerfile: Dockerfile.base
       args:
         APP_NAME: onboarding
     ports:
-      - '${ONBOARDING_PORT}:80'
+      - '${ONBOARDING_PORT}:3000'
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
       - api-leads
-
-  db-core:
-    image: mongo:latest
-    ports:
-      - '${DB_CORE_PORT}:27017'
-    volumes:
-      - db-core:/data/db
 
   api-core:
     build:
@@ -88,11 +90,15 @@ services:
     ports:
       - '${API_CORE_PORT}:3000'
     environment:
-      NODE_ENV: production
-      DB_CORE_HOST: mongodb://db-core:27017/api-core
+      NODE_ENV: development
+      DB_CORE_HOST: mongodb://localhost:27017/api-core
       APP_NAME: api-core
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
-      - db-core
+      - db
       - api-auth
 
   api-realtime:
@@ -104,8 +110,12 @@ services:
     ports:
       - '${API_REALTIME_PORT}:3000'
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       APP_NAME: api-realtime
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
       - api-core
 
@@ -118,21 +128,29 @@ services:
     ports:
       - '${CORE_BACKOFFICE_PORT}:3000'
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       APP_NAME: core-backoffice
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
       - api-core
 
   manager:
     build:
       context: .
-      dockerfile: Dockerfile.react.base
+      dockerfile: Dockerfile.base
       args:
         APP_NAME: manager
     ports:
-      - '${MANAGER_PORT}:80'
+      - '${MANAGER_PORT}:4200'
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
       - api-core
       - api-realtime
@@ -140,26 +158,34 @@ services:
   menu:
     build:
       context: .
-      dockerfile: Dockerfile.react.base
+      dockerfile: Dockerfile.base
       args:
         APP_NAME: menu
     ports:
-      - '${MENU_PORT}:80'
+      - '${MENU_PORT}:4200'
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
       - api-core
 
   order:
     build:
       context: .
-      dockerfile: Dockerfile.react.base
+      dockerfile: Dockerfile.base
       args:
         APP_NAME: order
     ports:
-      - '${ORDER_PORT}:80'
+      - '${ORDER_PORT}:4200'
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
       - api-core
       - api-realtime
@@ -167,13 +193,17 @@ services:
   payment:
     build:
       context: .
-      dockerfile: Dockerfile.react.base
+      dockerfile: Dockerfile.base
       args:
         APP_NAME: payment
     ports:
-      - '${PAYMENT_PORT}:80'
+      - '${PAYMENT_PORT}:4200'
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
     depends_on:
       - api-core
 
@@ -183,6 +213,5 @@ networks:
     driver: bridge
 
 volumes:
-  db-auth:
-  db-leads:
-  db-core:
+  db-data:
+  node_modules:

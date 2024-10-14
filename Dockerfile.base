@@ -1,8 +1,7 @@
-FROM node:20-alpine AS builder
+# Stage 1: Prepare development image
+FROM node:20-alpine AS base
 
 WORKDIR /app
-
-ARG APP_NAME
 
 COPY package*.json ./
 COPY nx.json ./
@@ -11,27 +10,18 @@ COPY eslint.config.js ./
 COPY jest.preset.js ./
 COPY jest.config.ts ./
 COPY libs/ libs/
-
 COPY apps/ apps/
 
 RUN npm install
 
-RUN npx nx reset
-
-RUN npm run build:${APP_NAME} -- --prod --skip-nx-cache --verbose
-
-FROM node:20-alpine AS production
+# Stage 2: Build development image
+FROM base AS development
 
 WORKDIR /app
 
+ARG APP_NAME
 ENV APP_NAME=${APP_NAME}
 
-COPY package*.json ./
+EXPOSE 4200
 
-RUN npm cache clean --force && npm install --production
-
-COPY --from=builder /app/dist/apps/${APP_NAME} ./apps/${APP_NAME}
-
-EXPOSE 3000
-
-CMD ["/bin/sh", "-c", "node apps/${APP_NAME}/main.js"]
+CMD ["/bin/sh", "-c", "npm run serve:${APP_NAME}"]

@@ -1,0 +1,188 @@
+name: 'barnie-prod'
+services:
+  db-auth:
+    image: mongo:latest
+    ports:
+      - '${DB_AUTH_PORT}:27017'
+    volumes:
+      - db-auth:/data/db
+
+  api-auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+      args:
+        APP_NAME: api-auth
+    ports:
+      - '${API_AUTH_PORT}:3000'
+    environment:
+      NODE_ENV: production
+      DB_AUTH_HOST: mongodb://db-auth:27017/api-auth
+      APP_NAME: api-auth
+    depends_on:
+      - db-auth
+
+  db-leads:
+    image: mongo:latest
+    ports:
+      - '${DB_LEADS_PORT}:27017'
+    volumes:
+      - db-leads:/data/db
+
+  api-leads:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+      args:
+        APP_NAME: api-leads
+    ports:
+      - '${API_LEADS_PORT}:3000'
+    environment:
+      NODE_ENV: production
+      DB_LEADS_HOST: mongodb://db-leads:27017/api-leads
+      APP_NAME: api-leads
+    depends_on:
+      - db-leads
+      - api-auth
+
+  leads-backoffice:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+      args:
+        APP_NAME: leads-backoffice
+    ports:
+      - '${LEADS_BACKOFFICE_PORT}:3000'
+    environment:
+      NODE_ENV: production
+      APP_NAME: leads-backoffice
+    depends_on:
+      - api-leads
+
+  onboarding:
+    build:
+      context: .
+      dockerfile: Dockerfile.react.base
+      args:
+        APP_NAME: onboarding
+    ports:
+      - '${ONBOARDING_PORT}:80'
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - api-leads
+
+  db-core:
+    image: mongo:latest
+    ports:
+      - '${DB_CORE_PORT}:27017'
+    volumes:
+      - db-core:/data/db
+
+  api-core:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+      args:
+        APP_NAME: api-core
+    ports:
+      - '${API_CORE_PORT}:3000'
+    environment:
+      NODE_ENV: production
+      DB_CORE_HOST: mongodb://db-core:27017/api-core
+      APP_NAME: api-core
+    depends_on:
+      - db-core
+      - api-auth
+
+  api-realtime:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+      args:
+        APP_NAME: api-realtime
+    ports:
+      - '${API_REALTIME_PORT}:3000'
+    environment:
+      NODE_ENV: production
+      APP_NAME: api-realtime
+    depends_on:
+      - api-core
+
+  core-backoffice:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+      args:
+        APP_NAME: core-backoffice
+    ports:
+      - '${CORE_BACKOFFICE_PORT}:3000'
+    environment:
+      NODE_ENV: production
+      APP_NAME: core-backoffice
+    depends_on:
+      - api-core
+
+  manager:
+    build:
+      context: .
+      dockerfile: Dockerfile.react.base
+      args:
+        APP_NAME: manager
+    ports:
+      - '${MANAGER_PORT}:80'
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - api-core
+      - api-realtime
+
+  menu:
+    build:
+      context: .
+      dockerfile: Dockerfile.react.base
+      args:
+        APP_NAME: menu
+    ports:
+      - '${MENU_PORT}:80'
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - api-core
+
+  order:
+    build:
+      context: .
+      dockerfile: Dockerfile.react.base
+      args:
+        APP_NAME: order
+    ports:
+      - '${ORDER_PORT}:80'
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - api-core
+      - api-realtime
+
+  payment:
+    build:
+      context: .
+      dockerfile: Dockerfile.react.base
+      args:
+        APP_NAME: payment
+    ports:
+      - '${PAYMENT_PORT}:80'
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - api-core
+
+networks:
+  default:
+    name: barnie_network
+    driver: bridge
+
+volumes:
+  db-auth:
+  db-leads:
+  db-core:
