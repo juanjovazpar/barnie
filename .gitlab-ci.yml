@@ -1,0 +1,14 @@
+stages:
+  - build
+
+build_images:
+  stage: build
+  script:
+    - echo "Building Docker images..."
+    - for app in $(ls apps); do
+      echo "Building image for $app";
+      docker build -t $CI_REGISTRY_IMAGE/$app:${CI_COMMIT_SHORT_SHA} --build-arg APP_NAME=$app -f Dockerfile.prod ./apps/$app;
+      docker push $CI_REGISTRY_IMAGE/$app:${CI_COMMIT_SHORT_SHA};
+      done
+  only:
+    - merge_requests
