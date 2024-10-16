@@ -29,8 +29,9 @@ build:
         for app in $APPS_CHANGED; do
           echo "Building image for $app";
           /kaniko/executor --context "${CI_PROJECT_DIR}/apps/$app" \
-            --dockerfile "${CI_PROJECT_DIR}/apps/$app/Dockerfile.prod" \
-            --destination $DOCKER_REGISTRY_IMAGE/$app:$IMAGE_TAG;
+              --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
+              --build-arg APP_NAME="$app" \  # Pasar el nombre de la app como argumento
+              --destination $DOCKER_REGISTRY_IMAGE/$app:$IMAGE_TAG;
         done;
       else
         echo "No affected apps found.";
