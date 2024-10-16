@@ -5,13 +5,15 @@ stages:
 build:
   stage: build
   image:
-    name: gcr.io/kaniko-project/executor:debug
+    name: alpine:latest
     entrypoint: ['']
+  before_script:
+    - apk add --no-cache git
   variables:
     CONTAINER_REGISTRY: $CI_REGISTRY
   script:
     - echo "Identifying afected apps by this commit..."
-    - APPS_CHANGED=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep -oP '^apps/\K[^/]*' | sort -u)
+    - APPS_CHANGED=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep '^apps/' | cut -d'/' -f2 | sort -u)
 
     # Check if any app has been affected by this commit:
     - |
