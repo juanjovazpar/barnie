@@ -11,6 +11,13 @@ build:
   variables:
     CONTAINER_REGISTRY: $CI_REGISTRY
   script:
+    # Install necessary tools
+    - apk add --no-cache git curl jq
+
+    # Check Project ID and Merge Request IID
+    - echo "Project ID - $CI_PROJECT_ID"
+    - echo "Merge Request IID - $CI_MERGE_REQUEST_IID"
+
     # Identify affected applications by checking changes in the Merge Request
     - echo "Identifying affected apps by this commit..."
     - |
@@ -27,31 +34,14 @@ build:
           # Extract changed paths and identify apps
           APPS_CHANGED=$(echo "$RESPONSE" | jq -r '.changes[].new_path' | grep '^apps/' | cut -d'/' -f2 | sort -u)
         else
-          echo "No changes found or invalid response. Exiting...";
-          exit 1;
+          echo "No changes found or invalid response. Exiting..."
+          exit 1
         fi
       else
-        echo "Not a Merge Request. Exiting...";
-        exit 0;
+        echo "Not a Merge Request. Exiting..."
+        exit 0
       fi
 
-    # Check if any apps were changed
-    - |
-      if [ -z "$APPS_CHANGED" ]; then
-        echo "No affected applications found in this commit. Exiting...";
-        exit 0;
-      fi
-
-    # Build Docker images for each affected app
-    - |
-      for app in $APPS_CHANGED; do
-        echo "Building image for the app: $app";
-        /kaniko/executor \
-          --context "${CI_PROJECT_DIR}/apps/$app" \
-          --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
-          --destination "$CONTAINER_REGISTRY/$CI_PROJECT_PATH/$app:${CI_COMMIT_SHA}" \
-          --build-arg APP_NAME=$app;
-      done
   only:
     - merge_requests
   tags:
