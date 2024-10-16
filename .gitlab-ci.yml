@@ -1,35 +1,37 @@
 stages:
   - build
 
-# https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
 build:
   stage: build
   image:
     name: alpine:latest
     entrypoint: ['']
   before_script:
-    - apk add --no-cache git
-    # If there is no previous commit, do a full fetch:
-    - if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
-      git fetch --unshallow;
-      fi
+    - apk add --no-cache git curl jq
   variables:
     CONTAINER_REGISTRY: $CI_REGISTRY
   script:
     - echo "Identifying afected apps by this commit..."
-    - APPS_CHANGED=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep '^apps/' | cut -d'/' -f2 | sort -u)
-
-    # Check if any app has been affected by this commit:
     - |
-      if [ -z "$APPS_CHANGED" ]; then
-        echo "No hay aplicaciones afectadas en este commit. Saliendo..."
-        exit 0
+      if [ "$CI_MERGE_REQUEST_IID" ]; then
+        # Obtained modified files from Merge Request
+        APPS_CHANGED=$(curl --header "PRIVATE-TOKEN: $GITLAB_ACCESS_TOKEN" \
+          "http://gitlab/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/changes" | \
+          jq -r '.changes[].new_path' | grep '^apps/' | cut -d'/' -f2 | sort -u)
+      else
+        echo "This is not a Merge Request. Exiting...";
+        exit 0;
       fi
 
-    # Build and register apps images:
+    - |
+      if [ -z "$APPS_CHANGED" ]; then
+        echo "There is not apps affectd by this commit. Exiting...";
+        exit 0;
+      fi
+
     - |
       for app in $APPS_CHANGED; do
-        echo "Construyendo imagen para la app: $app";
+        echo "Building app: $app";
         /kaniko/executor \
           --context "${CI_PROJECT_DIR}/apps/$app" \
           --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
