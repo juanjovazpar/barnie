@@ -4,46 +4,34 @@ stages:
 build:
   stage: build
   image:
-    name: alpine:latest
+    name: gcr.io/kaniko-project/executor:debug
     entrypoint: ['']
-  before_script:
-    - apk add --no-cache git curl jq
   variables:
-    CONTAINER_REGISTRY: $CI_REGISTRY
+    CONTAINER_NAME: momomo
+    CONTAINER_TAG: 1.0.0
+  before_script:
+    - apk add --no-cache git
   script:
-    # Install necessary tools
-    - apk add --no-cache git curl jq
-
-    # Check Project ID and Merge Request IID
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Merge Request IID - ${CI_MERGE_REQUEST_IID}"
 
-    # Identify affected applications by checking changes in the Merge Request
+    # Ensure we have a full clone
+    - git fetch --unshallow || echo "Already a full clone"
+
+    # Identify affected apps by this commit
     - echo "Identifying affected apps by this commit..."
+    - APPS_CHANGED=$(git diff --name-only origin/main...$CI_COMMIT_SHA | grep '^apps/' | cut -d'/' -f2 | sort -u)
+
+    # Loop through affected apps and build them
     - |
-      if [ "$CI_MERGE_REQUEST_IID" ]; then
-        echo "Fetching changes from API..."
-        echo "Using access token: ${GITLAB_ACCESS_TOKEN:0:4}..." # Debug token (only showing first 4 characters)
-        RESPONSE=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_ACCESS_TOKEN" \
-          --verbose "http://gitlab:80/api/v4/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/changes")
-
-        # Debug: Print the response from GitLab API
-        echo "API Response: $RESPONSE"
-
-        # Check if the response is valid and contains changes
-        if echo "$RESPONSE" | jq -e '.changes' >/dev/null; then
-          # Extract changed paths and identify apps
-          APPS_CHANGED=$(echo "$RESPONSE" | jq -r '.changes[].new_path' | grep '^apps/' | cut -d'/' -f2 | sort -u)
-          echo "Affected apps: $APPS_CHANGED"
-        else
-          echo "No changes found or invalid response. Exiting..."
-          exit 1
-        fi
+      if [ -n "$APPS_CHANGED" ]; then
+        echo "Changed apps: $APPS_CHANGED";
+        for app in $APPS_CHANGED; do
+          echo "Building image for $app";
+          /kaniko/executor --context "${CI_PROJECT_DIR}/apps/$app" --dockerfile "${CI_PROJECT_DIR}/apps/$app/Dockerfile.prod" --destination $CONTAINER_REGISTRY/$app:$CONTAINER_TAG;
+        done;
       else
-        echo "Not a Merge Request. Exiting..."
-        exit 0
+        echo "No affected apps found.";
       fi
-  only:
-    - merge_requests
   tags:
     - kaniko
