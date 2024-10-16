@@ -3,9 +3,9 @@ stages:
 
 build:
   stage: build
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: ['']
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git # Instala git en Alpine
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Merge Request IID - ${CI_MERGE_REQUEST_IID}"
@@ -22,7 +22,7 @@ build:
     - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
 
-    # Loop through affected apps and build them
+    # Loop through affected apps and build them using Kaniko
     - |
       if [ -n "$APPS_CHANGED" ]; then
         echo "Changed apps: $APPS_CHANGED";
@@ -30,7 +30,7 @@ build:
           echo "Building image for $app";
           /kaniko/executor --context "${CI_PROJECT_DIR}/apps/$app" \
             --dockerfile "${CI_PROJECT_DIR}/apps/$app/Dockerfile.prod" \
-            --destination gcr.io/myregistry/$app:$IMAGE_TAG;  # Usando el hash y el ID de la merge request
+            --destination gcr.io/myregistry/$app:$IMAGE_TAG;
         done;
       else
         echo "No affected apps found.";
