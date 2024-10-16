@@ -4,27 +4,21 @@ stages:
 build:
   stage: build
   image:
-    name: gcr.io/kaniko-project/executor:debug # Usa la imagen de Kaniko
+    name: gcr.io/kaniko-project/executor:debug # Imagen de Kaniko
     entrypoint: [''] # Elimina el entrypoint predeterminado
   variables:
-    # Variables para el registro del GitLab
-    DOCKER_REGISTRY: $CI_REGISTRY # La URL del registry de GitLab (registry.gitlab.com)
-    DOCKER_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE # El nombre del proyecto en el registry
-  before_script:
-    - apk add --no-cache git # Instala git en la imagen de Kaniko
+    DOCKER_REGISTRY: $CI_REGISTRY # Registry de GitLab
+    DOCKER_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE # Nombre del proyecto en el registry
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Merge Request IID - ${CI_MERGE_REQUEST_IID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
 
-    # Ensure we have a full clone
-    - git fetch --unshallow || echo "Already a full clone"
-
-    # Identify affected apps by this commit
+    # Identificar aplicaciones afectadas con la variable CI_COMMIT_REF_NAME para el branch actual
     - echo "Identifying affected apps by this commit..."
-    - APPS_CHANGED=$(git diff --name-only origin/main...$CI_COMMIT_SHA | grep '^apps/' | cut -d'/' -f2 | sort -u)
+    - APPS_CHANGED=$(find apps -type d -mindepth 1 -maxdepth 1 -exec basename {} \;)
 
-    # Define a tag for the image using el hash del commit y el ID de la merge request
+    # Definir la etiqueta de la imagen usando el hash del commit y el ID del merge request
     - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
 
@@ -36,7 +30,7 @@ build:
           echo "Building image for $app";
           /kaniko/executor --context "${CI_PROJECT_DIR}/apps/$app" \
             --dockerfile "${CI_PROJECT_DIR}/apps/$app/Dockerfile.prod" \
-            --destination $DOCKER_REGISTRY_IMAGE/$app:$IMAGE_TAG;  # Envía la imagen al registry de GitLab
+            --destination $DOCKER_REGISTRY_IMAGE/$app:$IMAGE_TAG;
         done;
       else
         echo "No affected apps found.";
