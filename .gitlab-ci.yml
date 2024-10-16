@@ -27,11 +27,16 @@ build:
       if [ -n "$APPS_CHANGED" ]; then
         echo "Changed apps: $APPS_CHANGED";
         for app in $APPS_CHANGED; do
-          echo "Building image for $app";
-          /kaniko/executor --context "${CI_PROJECT_DIR}/apps/$app" \
+          if [ -f "${CI_PROJECT_DIR}/Dockerfile.prod" ]; then
+            echo "Building image for $app";
+            echo "Running command: /kaniko/executor --context '${CI_PROJECT_DIR}' --dockerfile '${CI_PROJECT_DIR}/Dockerfile.prod' --build-arg APP_NAME='$app' --destination '$DOCKER_REGISTRY_IMAGE/$app:$IMAGE_TAG'"
+            /kaniko/executor --context "${CI_PROJECT_DIR}" \
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
-              --build-arg APP_NAME="$app" \  # Pasar el nombre de la app como argumento
-              --destination $DOCKER_REGISTRY_IMAGE/$app:$IMAGE_TAG;
+              --build-arg APP_NAME="$app" \
+              --destination "$DOCKER_REGISTRY_IMAGE/$app:$IMAGE_TAG";
+          else
+            echo "Skipping $app - Dockerfile.prod not found";
+          fi
         done;
       else
         echo "No affected apps found.";
