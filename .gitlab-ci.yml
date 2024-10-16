@@ -9,6 +9,10 @@ build:
     entrypoint: ['']
   before_script:
     - apk add --no-cache git
+    # If there is no previous commit, do a full fetch:
+    - if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+      git fetch --unshallow;
+      fi
   variables:
     CONTAINER_REGISTRY: $CI_REGISTRY
   script:
