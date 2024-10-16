@@ -28,9 +28,13 @@ build:
         echo "Changed apps: $APPS_CHANGED";
         for app in $APPS_CHANGED; do
           echo "Building image for $app";
-          /kaniko/executor --context "${CI_PROJECT_DIR}/apps/$app" \
-            --dockerfile "${CI_PROJECT_DIR}/apps/$app/Dockerfile.prod" \
-            --destination gcr.io/myregistry/$app:$IMAGE_TAG;
+          docker run --rm \
+            -v ${CI_PROJECT_DIR}/apps/$app:/workspace \
+            -v /kaniko/.docker:/kaniko/.docker \
+            gcr.io/kaniko-project/executor:debug \
+            --context /workspace \
+            --dockerfile /workspace/Dockerfile.prod \
+            --destination gcr.io/myregistry/$app:$IMAGE_TAG;  # Usando el tag generado
         done;
       else
         echo "No affected apps found.";
