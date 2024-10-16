@@ -12,7 +12,7 @@ build:
   script:
     - echo "Identifying afected apps by this commit..."
     - APPS_CHANGED=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep -oP '^apps/\K[^/]*' | sort -u)
-    
+
     # Check if any app has been affected by this commit:
     - |
       if [ -z "$APPS_CHANGED" ]; then
@@ -21,8 +21,9 @@ build:
       fi
 
     # Build and register apps images:
-    - for app in $APPS_CHANGED; do
-        echo "Building image for app: $app";
+    - |
+      for app in $APPS_CHANGED; do
+        echo "Construyendo imagen para la app: $app";
         /kaniko/executor \
           --context "${CI_PROJECT_DIR}/apps/$app" \
           --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
