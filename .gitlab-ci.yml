@@ -11,27 +11,38 @@ build:
   variables:
     CONTAINER_REGISTRY: $CI_REGISTRY
   script:
-    - echo "Identifying afected apps by this commit..."
+    # Identify affected applications by checking changes in the Merge Request
+    - echo "Identifying affected apps by this commit..."
     - |
       if [ "$CI_MERGE_REQUEST_IID" ]; then
-        # Obtained modified files from Merge Request
-        APPS_CHANGED=$(curl --header "PRIVATE-TOKEN: $GITLAB_ACCESS_TOKEN" \
-          "http://gitlab/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/changes" | \
-          jq -r '.changes[].new_path' | grep '^apps/' | cut -d'/' -f2 | sort -u)
+        # Fetch changed files in the Merge Request using GitLab API
+        RESPONSE=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_ACCESS_TOKEN" \
+          "http://gitlab/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/changes")
+        
+        # Check if the response is valid
+        if [ -z "$RESPONSE" ]; then
+          echo "No response from GitLab API. Exiting...";
+          exit 1;
+        fi
+
+        # Extract changed paths and identify apps
+        APPS_CHANGED=$(echo "$RESPONSE" | jq -r '.changes[].new_path' | grep '^apps/' | cut -d'/' -f2 | sort -u)
       else
-        echo "This is not a Merge Request. Exiting...";
+        echo "Not a Merge Request. Exiting...";
         exit 0;
       fi
 
+    # Check if any apps were changed
     - |
       if [ -z "$APPS_CHANGED" ]; then
-        echo "There is not apps affectd by this commit. Exiting...";
+        echo "No affected applications found in this commit. Exiting...";
         exit 0;
       fi
 
+    # Build Docker images for each affected app
     - |
       for app in $APPS_CHANGED; do
-        echo "Building app: $app";
+        echo "Building image for the app: $app";
         /kaniko/executor \
           --context "${CI_PROJECT_DIR}/apps/$app" \
           --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
