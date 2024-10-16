@@ -20,7 +20,7 @@ build:
 
     # Define a tag for the image using the commit hash and merge request ID
     - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
-    - echo "Using image tag: $IMAGE_TAG"
+    - echo "Using image tag - $IMAGE_TAG"
 
     # Loop through affected apps and build them
     - |
