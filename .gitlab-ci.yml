@@ -20,12 +20,12 @@ build:
 
     # Identify affected applications by checking changes in the Merge Request
     - echo "Identifying affected apps by this commit..."
-    - echo "http://gitlab/api/v4/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/changes"
+    - echo "http://gitlab:80/api/v4/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/changes"
     - |
       if [ "$CI_MERGE_REQUEST_IID" ]; then
         # Fetch changed files in the Merge Request using GitLab API
         RESPONSE=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_ACCESS_TOKEN" \
-          "http://gitlab/api/v4/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/changes")
+          "http://gitlab:80/api/v4/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/changes")
 
         # Debug: Print the response from GitLab API
         echo "API Response: $RESPONSE"
