@@ -18,15 +18,18 @@ build:
         # Fetch changed files in the Merge Request using GitLab API
         RESPONSE=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_ACCESS_TOKEN" \
           "http://gitlab/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/changes")
-        
-        # Check if the response is valid
-        if [ -z "$RESPONSE" ]; then
-          echo "No response from GitLab API. Exiting...";
+
+        # Debug: Print the response from GitLab API
+        echo "API Response: $RESPONSE"
+
+        # Check if the response is valid and contains changes
+        if echo "$RESPONSE" | jq -e '.changes' >/dev/null; then
+          # Extract changed paths and identify apps
+          APPS_CHANGED=$(echo "$RESPONSE" | jq -r '.changes[].new_path' | grep '^apps/' | cut -d'/' -f2 | sort -u)
+        else
+          echo "No changes found or invalid response. Exiting...";
           exit 1;
         fi
-
-        # Extract changed paths and identify apps
-        APPS_CHANGED=$(echo "$RESPONSE" | jq -r '.changes[].new_path' | grep '^apps/' | cut -d'/' -f2 | sort -u)
       else
         echo "Not a Merge Request. Exiting...";
         exit 0;
