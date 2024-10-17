@@ -4,11 +4,11 @@ stages:
 build:
   stage: build
   image:
-    name: gcr.io/kaniko-project/executor:debug # Imagen de Kaniko
-    entrypoint: [''] # Elimina el entrypoint predeterminado
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: ['']
   variables:
-    DOCKER_REGISTRY: $CI_REGISTRY # Registry de GitLab
-    DOCKER_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE # Nombre del proyecto en el registry
+    DOCKER_REGISTRY: $CI_REGISTRY
+    DOCKER_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Merge Request IID - ${CI_MERGE_REQUEST_IID}"
@@ -16,11 +16,9 @@ build:
     - echo "CI_REGISTRY - ${CI_REGISTRY}"
     - echo "CI_REGISTRY_IMAGE - ${CI_REGISTRY_IMAGE}"
 
-    # Identificar aplicaciones afectadas con la variable CI_COMMIT_REF_NAME para el branch actual
     - echo "Identifying affected apps by this commit..."
     - APPS_CHANGED=$(find apps -type d -mindepth 1 -maxdepth 1 -exec basename {} \;)
 
-    # Definir la etiqueta de la imagen usando el hash del commit y el ID del merge request
     - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
 
