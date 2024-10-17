@@ -13,6 +13,8 @@ build:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Merge Request IID - ${CI_MERGE_REQUEST_IID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
+    - echo "CI_REGISTRY - ${CI_REGISTRY}"
+    - echo "CI_REGISTRY_IMAGE - ${CI_REGISTRY_IMAGE}"
 
     # Identificar aplicaciones afectadas con la variable CI_COMMIT_REF_NAME para el branch actual
     - echo "Identifying affected apps by this commit..."
