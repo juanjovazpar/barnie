@@ -2,7 +2,7 @@ stages:
   - build
 
 before_script:
-  - echo $CI_JOB_TOKEN | /kaniko/executor --destination $CI_REGISTRY_IMAGE --build-arg CI_JOB_TOKEN=$CI_JOB_TOKEN
+  - echo $CI_JOB_TOKEN | /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod --destination $CI_REGISTRY_IMAGE:$IMAGE_TAG --build-arg APP_NAME="$app" --docker-username "gitlab-ci-token" --docker-password "$CI_JOB_TOKEN"
 
 build:
   stage: build
