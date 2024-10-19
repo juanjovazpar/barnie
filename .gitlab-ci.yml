@@ -16,5 +16,3 @@ build:
       --destination $CI_REGISTRY_IMAGE/$CONTAINER_NAME:$CONTAINER_TAG-$CI_PIPELINE_IID
       --destination $CI_REGISTRY_IMAGE/$CONTAINER_NAME:latest
   when: manual
-  tags:
-    - kubernetes
