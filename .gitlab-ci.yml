@@ -1,9 +1,6 @@
 stages:
   - build
 
-before_script:
-  - echo $CI_JOB_TOKEN | /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod --destination $CI_REGISTRY_IMAGE:$IMAGE_TAG --build-arg APP_NAME="$app" --skip-tls-verify
-
 build:
   stage: build
   image:
@@ -18,6 +15,7 @@ build:
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
     - echo "CI_REGISTRY - ${CI_REGISTRY}"
     - echo "CI_REGISTRY_IMAGE - ${CI_REGISTRY_IMAGE}"
+    - echo $CI_JOB_TOKEN | /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod --destination $CI_REGISTRY_IMAGE:$IMAGE_TAG --build-arg APP_NAME="$app" --skip-tls-verify
 
     - echo "Identifying affected apps by this commit..."
     - APPS_CHANGED=$(find apps -type d -mindepth 1 -maxdepth 1 -exec basename {} \;)
