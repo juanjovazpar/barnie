@@ -1,6 +1,9 @@
 stages:
   - build
 
+before_script:
+  - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
 build:
   stage: build
   image:
