@@ -6,15 +6,12 @@ build:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: ['']
-  variables:
-    DOCKER_REGISTRY: $CI_REGISTRY
-    DOCKER_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Merge Request IID - ${CI_MERGE_REQUEST_IID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
     - echo "CI_REGISTRY - ${CI_REGISTRY}"
-    - echo "CI_REGISTRY_IMAGE - ${CI_REGISTRY_IMAGE}"
+    - echo "CI_REGISTRY_IMAGE | ${CI_REGISTRY_IMAGE}"
     - echo $CI_JOB_TOKEN | /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod --destination $CI_REGISTRY_IMAGE:$IMAGE_TAG --build-arg APP_NAME="$app" --skip-tls-verify
 
     - echo "Identifying affected apps by this commit..."
@@ -29,11 +26,11 @@ build:
         for app in $APPS_CHANGED; do
           if [ -f "${CI_PROJECT_DIR}/Dockerfile.prod" ]; then
             echo "Building image for $app";
-            echo "Running command: /kaniko/executor --context '${CI_PROJECT_DIR}' --dockerfile '${CI_PROJECT_DIR}/Dockerfile.prod' --build-arg APP_NAME='$app' --destination '$DOCKER_REGISTRY_IMAGE/$app:$IMAGE_TAG'"
+            echo "Running command: /kaniko/executor --context '${CI_PROJECT_DIR}' --dockerfile '${CI_PROJECT_DIR}/Dockerfile.prod' --build-arg APP_NAME='$app' --destination '$CI_REGISTRY_IMAGE/$app:$IMAGE_TAG'"
             /kaniko/executor --context "${CI_PROJECT_DIR}" \
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
               --build-arg APP_NAME="$app" \
-              --destination "$DOCKER_REGISTRY_IMAGE/$app:$IMAGE_TAG";
+              --destination "$CI_REGISTRY_IMAGE/$app:$IMAGE_TAG";
           else
             echo "Skipping $app - Dockerfile.prod not found";
           fi
