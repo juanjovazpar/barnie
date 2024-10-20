@@ -25,21 +25,21 @@ build:
       if [ -n "$APPS_CHANGED" ]; then
         echo "Changed apps: $APPS_CHANGED";
         for app in $APPS_CHANGED; do
-          if [ -f "${CI_PROJECT_DIR}/Dockerfile.prod" ]; then
+          if [ -f "${CI_PROJECT_DIR}/Dockerfile" ]; then
             echo "Building image for $app";
 
             DESTINATION="10.110.255.103:5000/barnie/$app:$IMAGE_TAG"
             echo "Pushing image to $DESTINATION";
 
             /kaniko/executor --context "${CI_PROJECT_DIR}" \
-              --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
+              --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
               --build-arg APP_NAME="$app" \
               --destination "$DESTINATION" \
               --skip-tls-verify;
 
             echo "Image pushed to Harbor registry for $app";
           else
-            echo "Skipping $app - Dockerfile.prod not found";
+            echo "Skipping $app - Dockerfile not found";
           fi
         done;
       else
