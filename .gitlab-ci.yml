@@ -16,8 +16,12 @@ build:
     - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
 
+    - echo "Harbor password - $HARBOR_PASSWORD"
+
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"10.110.255.103:5000\":{\"username\":\"robot\$barnie+gitlab\",\"password\":\"$HARBOR_PASSWORD\",\"email\":\"robot\$barnie+gitlab@example.com\"}}}" > ~/.docker/config.json
+
+    - cat ~/.docker/config.json
 
     - |
       if [ -n "$APPS_CHANGED" ]; then
@@ -28,7 +32,7 @@ build:
             /kaniko/executor --context "${CI_PROJECT_DIR}" \
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
               --build-arg APP_NAME="$app" \
-              --destination "10.110.255.103:5000/barnie/$app:$IMAGE_TAG" \
+              --destination "http://10.110.255.103:5000/barnie/$app:$IMAGE_TAG" \
               --skip-tls-verify;  # Mantén la opción de skip-tls-verify
 
             echo "Image pushed to Harbor registry for $app";
