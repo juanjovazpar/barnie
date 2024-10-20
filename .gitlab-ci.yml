@@ -20,7 +20,7 @@ build:
     - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
 
-    - echo "$HARBOR_PASSWORD" | docker login 10.110.255.103:5000 -u "$HARBOR_USERNAME" --password-stdin --insecure
+    - echo "$HARBOR_PASSWORD" | docker login 10.110.255.103:5000 -u "$HARBOR_USERNAME" --password-stdin
 
     - |
       if [ -n "$APPS_CHANGED" ]; then
