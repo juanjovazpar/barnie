@@ -3,7 +3,7 @@ stages:
 
 build:
   stage: build
-  image: gcr.io/kaniko-project/executor:latest
+  image: docker:latest
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
@@ -25,8 +25,7 @@ build:
             /kaniko/executor --context "${CI_PROJECT_DIR}" \
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
               --build-arg APP_NAME="$app" \
-              --destination "http://10.110.255.103:5000/barnie/$app:$IMAGE_TAG" \
-              --insecure \
+              --destination "10.110.255.103:5000/barnie/$app:$IMAGE_TAG" \
               --skip-tls-verify;
 
             echo "Image pushed to Harbor registry for $app";
