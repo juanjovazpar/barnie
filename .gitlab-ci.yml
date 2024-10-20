@@ -17,7 +17,7 @@ build:
     - echo "Using image tag - $IMAGE_TAG"
 
     - mkdir -p ~/.docker
-    - echo "{\"auths\":{\"10.110.255.103:5000\":{\"username\":\"admin\",\"password\":\"Harbor12345\",\"email\":\"robot\$barnie+gitlab@example.com\"}}}" > ~/.docker/config.json
+    - echo "{\"auths\":{\"10.110.255.103:5000\":{\"username\":\"robot\$barnie+gitlab\",\"password\":\"$HARBOR_PASSWORD\",\"email\":\"robot\$barnie+gitlab@example.com\"}}}" > ~/.docker/config.json
 
     - cat ~/.docker/config.json
 
