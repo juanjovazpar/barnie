@@ -17,9 +17,10 @@ build:
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
     - echo "Identifying affected apps by this commit..."
     - APPS_CHANGED=$(find apps -type d -mindepth 1 -maxdepth 1 -exec basename {} \;)
+    - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
-    - echo "Logging into Harbor..."
-    - echo "$HARBOR_PASSWORD" | docker login 10.110.255.103:5000 -u "$HARBOR_USERNAME" --password-stdin
+
+    - echo "$HARBOR_PASSWORD" | docker login 10.110.255.103:5000 -u "$HARBOR_USERNAME" --password-stdin --insecure
 
     - |
       if [ -n "$APPS_CHANGED" ]; then
