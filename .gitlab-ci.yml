@@ -6,8 +6,7 @@ build:
   image: docker:20.10.7-dind
   services:
     - name: docker:20.10.7-dind
-  before_script:
-    - export DOCKER_TLS_CERTDIR=""
+      alias: docker
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
