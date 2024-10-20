@@ -3,9 +3,9 @@ stages:
 
 build:
   stage: build
-  image: docker:20.10.7-dind # Docker-in-Docker
-  services:
-    - name: docker:20.10.7-dind
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: ['']
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
@@ -16,13 +16,7 @@ build:
     - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
 
-    # Añadimos la configuración de DOCKER_OPTS para permitir registros inseguros
-    - export DOCKER_CLI_EXPERIMENTAL=enabled
-    - export DOCKER_BUILDKIT=1
-    - echo "Using Docker registry - 10.110.255.103:5000"
-
-    # Login en el registry de Harbor
-    - echo "$HARBOR_PASSWORD" | docker login 10.110.255.103:5000 -u "robot\$barnie+gitlab" --password-stdin --insecure
+    - echo "$HARBOR_PASSWORD" | docker login 10.110.255.103 -u "robot\$barnie+gitlab" --password-stdin
 
     - |
       if [ -n "$APPS_CHANGED" ]; then
@@ -30,8 +24,11 @@ build:
         for app in $APPS_CHANGED; do
           if [ -f "${CI_PROJECT_DIR}/Dockerfile.prod" ]; then
             echo "Building image for $app";
-            docker build -t "10.110.255.103:5000/barnie/$app:$IMAGE_TAG" -f "${CI_PROJECT_DIR}/Dockerfile.prod" .
-            docker push "10.110.255.103:5000/barnie/$app:$IMAGE_TAG"
+            /kaniko/executor --context "${CI_PROJECT_DIR}" \
+              --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
+              --build-arg APP_NAME="$app" \
+              --destination "10.110.255.103/barnie/$app:$IMAGE_TAG" \
+              --skip-tls-verify;  # Mantén la opción de skip-tls-verify
 
             echo "Image pushed to Harbor registry for $app";
           else
