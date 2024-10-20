@@ -1,19 +1,24 @@
 stages:
   - build
 
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ''
+  IMAGE_TAG: '${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}'
+
 build:
   stage: build
-  image: gcr.io/kaniko-project/executor:latest
+  image: docker:20.10.7-dind
+  services:
+    - name: docker:20.10.7-dind
+      alias: docker
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
-
     - echo "Identifying affected apps by this commit..."
     - APPS_CHANGED=$(find apps -type d -mindepth 1 -maxdepth 1 -exec basename {} \;)
-
-    - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
-
+    - echo "Logging into Harbor..."
     - echo "$HARBOR_PASSWORD" | docker login 10.110.255.103:5000 -u "$HARBOR_USERNAME" --password-stdin
 
     - |
@@ -21,19 +26,14 @@ build:
         echo "Changed apps: $APPS_CHANGED";
         for app in $APPS_CHANGED; do
           if [ -f "${CI_PROJECT_DIR}/Dockerfile.prod" ]; then
-            echo "Building image for $app";
-            /kaniko/executor --context "${CI_PROJECT_DIR}" \
-              --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
-              --build-arg APP_NAME="$app" \
-              --destination "http://10.110.255.103:5000/barnie/$app:$IMAGE_TAG" \
-              --insecure \
-              --skip-tls-verify;
-
-            echo "Image pushed to Harbor registry for $app";
+            echo "Building image for $app"
+            docker build -t "10.110.255.103:5000/barnie/$app:$IMAGE_TAG" -f "${CI_PROJECT_DIR}/Dockerfile.prod" .
+            docker push "10.110.255.103:5000/barnie/$app:$IMAGE_TAG"
+            echo "Image pushed to Harbor registry for $app"
           else
-            echo "Skipping $app - Dockerfile.prod not found";
+            echo "Skipping $app - Dockerfile.prod not found"
           fi
         done;
       else
-        echo "No affected apps found.";
+        echo "No affected apps found."
       fi
