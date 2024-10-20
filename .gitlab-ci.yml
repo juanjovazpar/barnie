@@ -1,4 +1,3 @@
-# CI_REGISTRY_PASSWORD must be define as a variable in GitLab CI/CD settings: "$CI_REGISTRY_PASSWORD"
 stages:
   - build
 
@@ -18,6 +17,24 @@ build:
     - echo "Using image tag - $IMAGE_TAG"
 
     - |
+      echo "Checking and creating repositories in Harbor for affected apps...";
+      for app in $APPS_CHANGED; do
+        REPO_EXISTS=$(curl -s -u "$HARBOR_USERNAME:$HARBOR_PASSWORD" \
+          "http://harbor-registry.devops.svc.cluster.local/api/repositories?project_id=barnie&name=barnie/$app" \
+          | jq '.[] | select(.name == "barnie/'$app'")' || echo "null")
+        
+        if [ "$REPO_EXISTS" == "null" ]; then
+          echo "Repository for $app does not exist. Creating now...";
+          curl -s -u "$HARBOR_USERNAME:$HARBOR_PASSWORD" -X POST \
+            "http://harbor-registry.devops.svc.cluster.local/api/repositories?project_id=barnie" \
+            -H "Content-Type: application/json" \
+            -d '{"name": "barnie/'$app'"}';
+        else
+          echo "Repository for $app already exists. Skipping creation.";
+        fi
+      done
+
+    - |
       if [ -n "$APPS_CHANGED" ]; then
         echo "Changed apps: $APPS_CHANGED";
         for app in $APPS_CHANGED; do
@@ -26,11 +43,15 @@ build:
             /kaniko/executor --context "${CI_PROJECT_DIR}" \
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
               --build-arg APP_NAME="$app" \
-              --tarPath "/tmp/${app}-${IMAGE_TAG}.tar";
+              --tarPath "/tmp/${app}-${IMAGE_TAG}.tar" \
+              --no-push;
             
-            echo "Uploading image to GitLab Package Registry for $app";
-            curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "/tmp/${app}-${IMAGE_TAG}.tar" \
-              "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/$app/$IMAGE_TAG/${app}-${IMAGE_TAG}.tar"
+            echo "Pushing image to Harbor registry for $app";
+            /kaniko/executor --context "${CI_PROJECT_DIR}" \
+              --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
+              --build-arg APP_NAME="$app" \
+              --destination "harbor-registry.devops.svc.cluster.local/barnie/$app:$IMAGE_TAG" \
+              --skip-tls-verify;
           else
             echo "Skipping $app - Dockerfile.prod not found";
           fi
