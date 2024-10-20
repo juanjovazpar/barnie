@@ -6,14 +6,17 @@ build:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: ['']
+  variables:
+    CI_REGISTRY: 'gitlab'
+    CI_REGISTRY_IMAGE: 'gitlab/oakdew/barnie'
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
-    - echo "Merge Request IID - ${CI_MERGE_REQUEST_IID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
     - echo "CI_REGISTRY - ${CI_REGISTRY}"
     - echo "CI_REGISTRY_IMAGE - ${CI_REGISTRY_IMAGE}"
+    - echo $CI_JOB_TOKEN | /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod --destination $CI_REGISTRY_IMAGE:$IMAGE_TAG --build-arg APP_NAME="$app" --skip-tls-verify
 
-    - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
+    - IMAGE_TAG="${CI_COMMIT_SHA:0:8}"
     - echo "Using image tag - $IMAGE_TAG"
     - echo "Building image with kaniko"
     - echo $CI_JOB_TOKEN | /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod --destination $CI_REGISTRY_IMAGE:$IMAGE_TAG --build-arg APP_NAME="$app" --skip-tls-verify
