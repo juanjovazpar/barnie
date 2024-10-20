@@ -17,24 +17,6 @@ build:
     - echo "Using image tag - $IMAGE_TAG"
 
     - |
-      echo "Checking and creating repositories in Harbor for affected apps...";
-      for app in $APPS_CHANGED; do
-        REPO_EXISTS=$(curl -s -u "$HARBOR_USERNAME:$HARBOR_PASSWORD" \
-          "http://harbor-registry.devops.svc.cluster.local/api/repositories?project_id=barnie&name=barnie/$app" \
-          | jq '.[] | select(.name == "barnie/'$app'")' || echo "null")
-        
-        if [ "$REPO_EXISTS" == "null" ]; then
-          echo "Repository for $app does not exist. Creating now...";
-          curl -s -u "$HARBOR_USERNAME:$HARBOR_PASSWORD" -X POST \
-            "http://harbor-registry.devops.svc.cluster.local/api/repositories?project_id=barnie" \
-            -H "Content-Type: application/json" \
-            -d '{"name": "barnie/'$app'"}';
-        else
-          echo "Repository for $app already exists. Skipping creation.";
-        fi
-      done
-
-    - |
       if [ -n "$APPS_CHANGED" ]; then
         echo "Changed apps: $APPS_CHANGED";
         for app in $APPS_CHANGED; do
@@ -43,15 +25,10 @@ build:
             /kaniko/executor --context "${CI_PROJECT_DIR}" \
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
               --build-arg APP_NAME="$app" \
-              --tarPath "/tmp/${app}-${IMAGE_TAG}.tar" \
-              --no-push;
-            
-            echo "Pushing image to Harbor registry for $app";
-            /kaniko/executor --context "${CI_PROJECT_DIR}" \
-              --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
-              --build-arg APP_NAME="$app" \
               --destination "harbor-registry.devops.svc.cluster.local/barnie/$app:$IMAGE_TAG" \
               --skip-tls-verify;
+
+            echo "Image pushed to Harbor registry for $app";
           else
             echo "Skipping $app - Dockerfile.prod not found";
           fi
