@@ -31,7 +31,8 @@ build:
             echo "Building image for $app";
             /kaniko/executor --context "${CI_PROJECT_DIR}" \
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
-              --build-arg APP_NAME="$app"; 
+              --build-arg APP_NAME="$app"
+              --no-push; 
 
             echo "Image pushed to Harbor registry for $app";
           else
