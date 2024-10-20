@@ -11,14 +11,15 @@ build:
     - echo "Merge Request IID - ${CI_MERGE_REQUEST_IID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
     - echo "CI_REGISTRY - ${CI_REGISTRY}"
-    - echo "CI_REGISTRY_IMAGE | ${CI_REGISTRY_IMAGE}"
+    - echo "CI_REGISTRY_IMAGE - ${CI_REGISTRY_IMAGE}"
+
+    - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
+    - echo "Using image tag - $IMAGE_TAG"
+    - echo "Building image with kaniko"
     - echo $CI_JOB_TOKEN | /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod --destination $CI_REGISTRY_IMAGE:$IMAGE_TAG --build-arg APP_NAME="$app" --skip-tls-verify
 
     - echo "Identifying affected apps by this commit..."
     - APPS_CHANGED=$(find apps -type d -mindepth 1 -maxdepth 1 -exec basename {} \;)
-
-    - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
-    - echo "Using image tag - $IMAGE_TAG"
 
     - |
       if [ -n "$APPS_CHANGED" ]; then
