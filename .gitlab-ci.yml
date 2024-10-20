@@ -32,9 +32,7 @@ build:
             /kaniko/executor --context "${CI_PROJECT_DIR}" \
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
               --build-arg APP_NAME="$app" \
-              --destination "10.110.255.103:5000/barnie/$app:$IMAGE_TAG" \
-              --skip-tls-verify
-              --skip-tls-verify-registry; 
+              --no-push; 
 
             echo "Image pushed to Harbor registry for $app";
           else
