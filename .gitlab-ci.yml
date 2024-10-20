@@ -1,6 +1,5 @@
 stages:
   - build
-  - push
 
 build:
   stage: build
@@ -10,6 +9,8 @@ build:
       alias: docker
   before_script:
     - export DOCKER_TLS_CERTDIR=""
+    - mkdir -p /var/run/docker.sock
+    - ln -s /var/run/docker.sock /var/run/docker.sock
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
@@ -26,47 +27,13 @@ build:
         for app in $APPS_CHANGED; do
           if [ -f "${CI_PROJECT_DIR}/Dockerfile.prod" ]; then
             echo "Building image for $app";
-            docker build -t "$app:$IMAGE_TAG" -f "${CI_PROJECT_DIR}/Dockerfile.prod" .
+            docker build -t "10.110.255.103:5000/barnie/$app:$IMAGE_TAG" -f "${CI_PROJECT_DIR}/Dockerfile.prod" .
 
-            # Guarda la imagen localmente en el caché de Docker
-            echo "Image built for $app, ready for the push stage";
+            echo "Image pushed to Harbor registry for $app";
           else
             echo "Skipping $app - Dockerfile.prod not found";
           fi
         done;
       else
         echo "No affected apps found.";
-      fi
-
-  artifacts:
-    paths:
-      - docker_images
-
-push:
-  stage: push
-  image: docker:20.10.7-dind
-  services:
-    - name: docker:20.10.7-dind
-      alias: docker
-  before_script:
-    - export DOCKER_TLS_CERTDIR=""
-  script:
-    - echo "$HARBOR_PASSWORD" | docker login 10.110.255.103:5000 -u "robot\$barnie+gitlab" --password-stdin
-
-    - |
-      if [ -n "$APPS_CHANGED" ]; then
-        echo "Pushing images for: $APPS_CHANGED";
-        for app in $APPS_CHANGED; do
-          if docker images | grep -q "$app:$IMAGE_TAG"; then
-            echo "Pushing image for $app";
-            docker tag "$app:$IMAGE_TAG" "10.110.255.103:5000/barnie/$app:$IMAGE_TAG"
-            docker push "10.110.255.103:5000/barnie/$app:$IMAGE_TAG"
-
-            echo "Image pushed to Harbor registry for $app";
-          else
-            echo "Image for $app not found locally, skipping push.";
-          fi
-        done;
-      else
-        echo "No images found for pushing.";
       fi
