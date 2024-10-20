@@ -31,7 +31,7 @@ build:
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
               --build-arg APP_NAME="$app" \
               --destination "https://10.110.255.103:5000/barnie/$app:$IMAGE_TAG" \
-              --skip-tls-verify;  # Mantén la opción de skip-tls-verify
+              --skip-tls-verify;
 
             echo "Image pushed to Harbor registry for $app";
           else
