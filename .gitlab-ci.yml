@@ -3,9 +3,12 @@ stages:
 
 build:
   stage: build
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: ['']
+  image: docker:20.10.7-dind
+  services:
+    - name: docker:20.10.7-dind
+  before_script:
+    - echo '{"insecure-registries":["10.110.255.103:5000"]}' > /etc/docker/daemon.json
+    - systemctl restart docker
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
@@ -16,26 +19,14 @@ build:
     - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
 
-    - mkdir -p ~/.docker
-    - echo "{\"auths\":{\"10.110.255.103:5000\":{\"username\":\"admin\",\"password\":\"Harbor12345\"}}}" > ~/.docker/config.json
-
-    - cat ~/.docker/config.json
-
     - |
       if [ -n "$APPS_CHANGED" ]; then
         echo "Changed apps: $APPS_CHANGED";
         for app in $APPS_CHANGED; do
           if [ -f "${CI_PROJECT_DIR}/Dockerfile.prod" ]; then
             echo "Building image for $app";
-
-            DESTINATION="10.110.255.103:5000/barnie/$app:$IMAGE_TAG"
-            echo "Pushing image to $DESTINATION";
-
-            /kaniko/executor --context "${CI_PROJECT_DIR}" \
-              --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
-              --build-arg APP_NAME="$app" \
-              --destination "$DESTINATION" \
-              --skip-tls-verify;
+            docker build -t "10.110.255.103:5000/barnie/$app:$IMAGE_TAG" -f "${CI_PROJECT_DIR}/Dockerfile.prod" .
+            docker push "10.110.255.103:5000/barnie/$app:$IMAGE_TAG"
 
             echo "Image pushed to Harbor registry for $app";
           else
