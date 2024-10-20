@@ -7,6 +7,7 @@ build:
   services:
     - name: docker:20.10.7-dind
   before_script:
+    - mkdir -p /etc/docker
     - echo '{"insecure-registries":["10.110.255.103:5000"]}' > /etc/docker/daemon.json
     - systemctl restart docker
   script:
