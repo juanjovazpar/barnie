@@ -1,3 +1,4 @@
+# CI_REGISTRY_PASSWORD must be define as a variable in GitLab CI/CD settings: "$CI_REGISTRY_PASSWORD"
 stages:
   - build
 
@@ -9,11 +10,6 @@ build:
   script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
-    - echo "CI_REGISTRY - ${CI_REGISTRY}"
-    - echo "CI_REGISTRY_IMAGE - ${CI_REGISTRY_IMAGE}"
-
-    # CI_REGISTRY_PASSWORD must be define as a variable in GitLab CI/CD settings
-    - echo "$CI_REGISTRY_PASSWORD" | /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod --destination $CI_REGISTRY_IMAGE:$IMAGE_TAG --build-arg APP_NAME="$app" --skip-tls-verify
 
     - echo "Identifying affected apps by this commit..."
     - APPS_CHANGED=$(find apps -type d -mindepth 1 -maxdepth 1 -exec basename {} \;)
@@ -27,11 +23,14 @@ build:
         for app in $APPS_CHANGED; do
           if [ -f "${CI_PROJECT_DIR}/Dockerfile.prod" ]; then
             echo "Building image for $app";
-            echo "Running command: /kaniko/executor --context '${CI_PROJECT_DIR}' --dockerfile '${CI_PROJECT_DIR}/Dockerfile.prod' --build-arg APP_NAME='$app' --destination '$CI_REGISTRY_IMAGE/$app:$IMAGE_TAG'"
             /kaniko/executor --context "${CI_PROJECT_DIR}" \
               --dockerfile "${CI_PROJECT_DIR}/Dockerfile.prod" \
               --build-arg APP_NAME="$app" \
-              --destination "$CI_REGISTRY_IMAGE/$app:$IMAGE_TAG";
+              --tarPath "/tmp/${app}-${IMAGE_TAG}.tar";
+            
+            echo "Uploading image to GitLab Package Registry for $app";
+            curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "/tmp/${app}-${IMAGE_TAG}.tar" \
+              "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/$app/$IMAGE_TAG/${app}-${IMAGE_TAG}.tar"
           else
             echo "Skipping $app - Dockerfile.prod not found";
           fi
