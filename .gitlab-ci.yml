@@ -3,16 +3,14 @@ stages:
 
 build:
   stage: build
-  image: ubuntu:20.04
-  before_script:
-    - apt-get update && apt-get install -y wget ca-certificates
-    - wget https://storage.googleapis.com/kaniko-project/executor/kaniko-v1.10.0-linux-amd64 -O /kaniko/executor
-    - chmod +x /kaniko/executor
+  image: gcr.io/kaniko-project/executor:latest
+  script:
     - echo "Project ID - ${CI_PROJECT_ID}"
     - echo "Commit SHA - ${CI_COMMIT_SHA}"
-  script:
+
     - echo "Identifying affected apps by this commit..."
     - APPS_CHANGED=$(find apps -type d -mindepth 1 -maxdepth 1 -exec basename {} \;)
+
     - IMAGE_TAG="${CI_COMMIT_SHA:0:8}-${CI_MERGE_REQUEST_IID}"
     - echo "Using image tag - $IMAGE_TAG"
 
