@@ -6,6 +6,7 @@ build_apps:
   variables:
     DOCKER_TLS_CERTDIR: ''
     DOCKER_BUILDKIT: 1
+    DOCKER_CLI_EXPERIMENTAL: 'enabled'
   before_script:
     - echo '{"insecure-registries":["harbor-registry.devops:5000"]}' > /etc/docker/daemon.json
     - service docker restart
