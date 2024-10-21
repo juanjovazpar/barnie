@@ -7,7 +7,6 @@ build_apps:
     DOCKER_TLS_CERTDIR: ''
   script:
     - dockerd --insecure-registry harbor-registry.devops:5000 &
-    - service docker restart
     - sleep 10
     - docker info | grep -i insecure
     - docker login -u "robot$barnie+gitlab" -p "2LcEgDACCuEWBzrwNZFvag4Z4QLkTosq" http://harbor-registry.devops:5000
