@@ -1,15 +1,11 @@
-stages:
-  - build
-
-variables:
-  DOCKER_DRIVER: overlay2
-
 build_apps:
   stage: build
   image: docker:latest
   services:
     - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: ''
   script:
-    - echo "Pipeline started"
+    - docker login -u "admin" -p "Harbor12345" http://harbor-registry.devops:5000
   only:
     - develop
