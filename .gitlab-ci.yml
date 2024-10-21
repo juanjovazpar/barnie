@@ -6,8 +6,7 @@ build_apps:
   variables:
     DOCKER_TLS_CERTDIR: ''
   script:
-    - echo '{"insecure-registries":["http://harbor-registry.devops:5000"]}' > /etc/docker/daemon.json
-    - dockerd &
+    - dockerd --insecure-registry harbor-registry.devops:5000 &
     - sleep 10
     - docker login -u "admin" -p "Harbor12345" http://harbor-registry.devops:5000
   only:
