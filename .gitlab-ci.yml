@@ -5,8 +5,10 @@ build_apps:
     - docker:dind
   variables:
     DOCKER_TLS_CERTDIR: ''
-    DOCKER_BUILDKIT: 1
+  before_script:
+    - echo '{"insecure-registries":["harbor-registry.devops:5000"]}' > /etc/docker/daemon.json
+    - service docker restart
   script:
-    - docker login -u "admin" -p "Harbor12345" --insecure-registry "harbor-registry.devops:5000"
+    - docker login -u "admin" -p "Harbor12345" http://harbor-registry.devops:5000
   only:
     - develop
