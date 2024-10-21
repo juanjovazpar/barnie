@@ -10,6 +10,6 @@ build_apps:
     - sleep 10
     - docker info | grep -i insecure
     - curl -v http://harbor-registry.devops:5000/v2/
-    - docker login -u "robot$barnie+gitlab" -p "2LcEgDACCuEWBzrwNZFvag4Z4QLkTosq" http://harbor-registry.devops:5000
+    - docker login -u "admin" -p "Harbor12345" http://harbor-registry.devops:5000
   only:
     - develop
