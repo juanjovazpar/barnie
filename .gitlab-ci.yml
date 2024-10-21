@@ -9,7 +9,6 @@ build_apps:
     - dockerd --insecure-registry harbor-registry.devops:5000 &
     - sleep 10
     - docker info | grep -i insecure
-    - curl -v http://harbor-registry.devops:5000/v2/
     - docker login -u "admin" -p "Harbor12345" http://harbor-registry.devops:5000
   only:
     - develop
