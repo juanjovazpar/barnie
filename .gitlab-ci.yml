@@ -8,6 +8,6 @@ build_apps:
   script:
     - dockerd --insecure-registry harbor-registry.devops:5000 &
     - sleep 10
-    - docker login -u "robot$barnie+gitlab" -p "2LcEgDACCuEWBzrwNZFvag4Z4QLkTosq" http://harbor-registry.devops:5000
+    - docker login -u "robot$barnie+gitlab" -p "2LcEgDACCuEWBzrwNZFvag4Z4QLkTosq" http://harbor-registry.devops:8080
   only:
     - develop
