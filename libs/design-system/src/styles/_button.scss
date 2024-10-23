@@ -50,4 +50,8 @@
   }
 
   @include button-states;
+
+  &-spinner {
+    @apply float-left -mt-0.5 mr-2;
+  }
 }

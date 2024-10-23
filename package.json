@@ -27,7 +27,7 @@
     "serve:onboarding": "nx serve onboarding --host 0.0.0.0",
     "serve:order": "nx serve order --host 0.0.0.0",
     "serve:payment": "nx serve payment --host 0.0.0.0",
-    "serve:design-system": "nx storybook design-system"
+    "serve:design-system": "nx storybook design-system --port 59090"
   },
   "private": true,
   "devDependencies": {

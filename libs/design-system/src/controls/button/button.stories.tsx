@@ -20,6 +20,7 @@ const meta: Meta<typeof Button> = {
       options: ['default', 'btn-xsmall', 'btn-small', 'btn-large'],
       defaultValue: 'default',
     },
+    loading: { control: 'boolean' },
   },
 };
 export default meta;
@@ -31,5 +32,6 @@ export const Primary = {
     disabled: false,
     className: 'btn-primary',
     size: '',
+    loading: false,
   },
 };

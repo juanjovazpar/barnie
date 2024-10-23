@@ -26,15 +26,18 @@
  * ```
  */
 
+import { Spinner } from '../../feedback/spinner';
+
 export type TButtonType = 'button' | 'submit' | 'reset';
 
 export interface IButtonProps {
   label: string;
-  onClick: () => void;
+  onClick?: () => void;
   type?: TButtonType;
   disabled?: boolean;
   className?: string;
   size?: string;
+  loading?: boolean;
   [key: string]: unknown;
 }
 
@@ -45,6 +48,7 @@ export const Button = ({
   disabled = false,
   className = '',
   size = '',
+  loading,
   ...props
 }: IButtonProps) => {
   return (
@@ -55,6 +59,11 @@ export const Button = ({
       disabled={disabled}
       {...props}
     >
+      {loading && (
+        <span className="btn-spinner">
+          <Spinner className={size.replace('btn-', 'spinner-')} />
+        </span>
+      )}
       {label}
     </button>
   );
