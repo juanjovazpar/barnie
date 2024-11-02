@@ -1,0 +1,37 @@
+.timeline {
+  &-slot {
+    @apply ps-2 my-2 first:mt-0;
+
+    &--title {
+      @apply text-xs font-medium uppercase text-gray-500;
+    }
+  }
+
+  &-item {
+    @apply flex gap-x-3 pt-1 relative rounded-lg;
+
+    &--line {
+      @apply relative last:after:hidden after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-gray-200;
+
+      &-wrapper {
+        @apply relative z-10 size-7 flex justify-center items-center;
+      }
+
+      &-dot {
+        @apply size-2 rounded-full bg-gray-400 dark:bg-neutral-600;
+      }
+    }
+
+    &--body {
+      @apply grow pt-0.5 pb-8;
+    }
+
+    &--title {
+      @apply flex gap-x-1.5 font-semibold text-gray-800;
+    }
+
+    &--description {
+      @apply mt-1 text-sm text-gray-600;
+    }
+  }
+}

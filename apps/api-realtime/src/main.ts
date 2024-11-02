@@ -1,8 +1,10 @@
 import Fastify from 'fastify';
 import { app } from './app/app';
 
-const host = process.env.HOST ?? 'localhost';
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const host = process.env.HOST ?? '0.0.0.0';
+const port = process.env.VITE_API_REALTIME_PORT
+  ? Number(process.env.VITE_API_REALTIME_PORT)
+  : 3000;
 
 // Instantiate Fastify with some config
 const server = Fastify({

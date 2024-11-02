@@ -1,0 +1,33 @@
+@mixin spinner-size($size) {
+  svg {
+    @apply w-#{$size} h-#{$size};
+  }
+}
+
+.spinner {
+  @include spinner-size(6);
+
+  svg {
+    @apply inline text-gray-200 animate-spin dark:text-gray-600 fill-blue-600;
+  }
+
+  &-xsmall {
+    @include spinner-size(2);
+  }
+
+  &-small {
+    @include spinner-size(3);
+  }
+
+  &-medium {
+    @include spinner-size(5);
+  }
+
+  &-large {
+    @include spinner-size(6);
+  }
+
+  &-xlarge {
+    @include spinner-size(10);
+  }
+}

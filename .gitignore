@@ -45,7 +45,9 @@ Thumbs.db
 .next
 out
 
+# Storybook
 storybook-static
 
+# Husky
 --help 
 -help

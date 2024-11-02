@@ -16,7 +16,11 @@
     "baseUrl": ".",
     "paths": {
       "@barnie/design-system": ["libs/design-system/src/index.ts"],
-      "@barnie/utils": ["libs/utils/src/index.ts"]
+      "@barnie/utils": ["libs/utils/index.ts"],
+      "@barnie/constants": ["libs/utils/src/constants/index.ts"],
+      "@barnie/interfaces": ["libs/utils/src/interfaces/index.ts"],
+      "@barnie/helpers": ["libs/utils/src/helpers/index.ts"],
+      "@barnie/middlewares": ["libs/utils/src/middlewares/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

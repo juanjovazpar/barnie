@@ -1,24 +1,14 @@
-image: node:20
-variables:
-  CI: 'true'
-
-# Main job
-CI:
-  interruptible: true
-  only:
-    - main
-    - merge_requests
+build_apps:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: ''
+  before_script:
+    - echo '{"insecure-registries":["harbor-registry.devops:5000"]}' > /etc/docker/daemon.json
+    - service docker restart
   script:
-    # This enables task distribution via Nx Cloud
-    # Run this command as early as possible, before dependencies are installed
-    # Learn more at https://nx.dev/ci/reference/nx-cloud-cli#npx-nxcloud-startcirun
-    - npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
-
-    - npm ci --legacy-peer-deps
-    - NX_HEAD=$CI_COMMIT_SHA
-    - NX_BASE=${CI_MERGE_REQUEST_DIFF_BASE_SHA:-$CI_COMMIT_BEFORE_SHA}
-
-    # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
-    # - npx nx-cloud record -- echo Hello World
-    # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
-    - npx nx affected --base=$NX_BASE --head=$NX_HEAD -t lint test build
+    - docker login -u "admin" -p "Harbor12345" http://harbor-registry.devops:5000
+  only:
+    - develop

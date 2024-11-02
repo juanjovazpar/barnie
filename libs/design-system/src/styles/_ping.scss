@@ -1,0 +1,47 @@
+@mixin ping-variant($bg-color) {
+  .ping-pulse,
+  .ping-indicator {
+    @apply bg-#{$bg-color};
+  }
+}
+
+.ping {
+  @apply flex absolute -mt-2 -me-2 top-1 end-1;
+  @include ping-variant(red-500);
+
+  &-wrapper {
+    @apply relative inline-flex;
+  }
+
+  &-pulse {
+    @apply absolute inline-flex size-full rounded-full opacity-75;
+  }
+
+  &-indicator {
+    @apply relative inline-flex rounded-full;
+  }
+
+  &.--with-label {
+    @apply top-0 end-0;
+
+    .ping-indicator {
+      @apply text-xs text-white py-0.5 px-1.5;
+    }
+  }
+
+  &:not(.--with-label) .ping-indicator {
+    @apply size-3;
+  }
+
+  &-primary {
+    @include ping-variant(primary);
+  }
+
+  &-secondary {
+    @include ping-variant(secondary);
+  }
+
+  &-tertiary {
+    @include ping-variant(tertiary);
+  }
+}

@@ -1,0 +1,71 @@
+@mixin bar-variant($bg-color) {
+  .progressbar-indicator {
+    @apply bg-#{$bg-color};
+  }
+}
+
+@mixin bar-size($height, $font-size) {
+  @apply h-#{$height} text-#{$font-size};
+
+  .progressbar-indicator {
+    @apply h-#{$height} text-#{$font-size};
+  }
+}
+
+.progressbar {
+  @apply w-full bg-gray-200;
+  @include bar-size(5, xs);
+  @include bar-variant(blue-500);
+
+  &,
+  &-indicator {
+    @apply flex overflow-hidden;
+  }
+
+  &-indicator {
+    @apply flex-col justify-center text-center text-white whitespace-nowrap transition duration-500;
+  }
+
+  &.rounded {
+    @apply rounded-full;
+  }
+
+  &-floating-tag {
+    @apply py-0.5 px-1.5 inline-block mb-2 bg-blue-50 border border-blue-200 text-xs font-medium text-blue-600 rounded-lg;
+  }
+
+  &-aside-tag {
+    @apply text-sm text-gray-800;
+  }
+
+  &-xsmall {
+    @include bar-size(1.5, xs);
+  }
+
+  &-small {
+    @include bar-size(3, xs);
+  }
+
+  &-large {
+    @include bar-size(7, lg);
+  }
+
+  &-xsmall,
+  &-small {
+    .progressbar-value {
+      display: none;
+    }
+  }
+
+  &-primary {
+    @include bar-variant(primary);
+  }
+
+  &-secondary {
+    @include bar-variant(secondary);
+  }
+
+  &-tertiary {
+    @include bar-variant(tertiary);
+  }
+}

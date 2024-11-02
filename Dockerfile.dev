@@ -1,0 +1,25 @@
+# Stage 1: Prepare development image
+FROM node:20-alpine AS base
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY nx.json ./
+COPY tsconfig.base.json ./
+COPY eslint.config.js ./
+COPY jest.preset.js ./
+COPY jest.config.ts ./
+COPY libs/ libs/
+COPY apps/ apps/
+
+RUN npm install
+
+# Stage 2: Build development image
+FROM base AS development
+
+WORKDIR /app
+
+ARG APP_NAME
+ENV APP_NAME=${APP_NAME}
+
+CMD ["/bin/sh", "-c", "npm run serve:${APP_NAME}"]

@@ -1,0 +1,217 @@
+name: 'barnie-dev'
+services:
+  db:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - db-data:/data/db
+
+  api-auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: api-auth
+    ports:
+      - '${API_AUTH_PORT}:3000'
+    environment:
+      NODE_ENV: development
+      DB_AUTH_HOST: mongodb://db:27017/api-auth
+      APP_NAME: api-auth
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - db
+
+  api-leads:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: api-leads
+    ports:
+      - '${API_LEADS_PORT}:3000'
+    environment:
+      NODE_ENV: development
+      DB_LEADS_HOST: mongodb://db:27017/api-leads
+      APP_NAME: api-leads
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - db
+      - api-auth
+
+  leads-backoffice:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: leads-backoffice
+    ports:
+      - '${LEADS_BACKOFFICE_PORT}:3000'
+    environment:
+      NODE_ENV: development
+      APP_NAME: leads-backoffice
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - api-leads
+
+  onboarding:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: onboarding
+    ports:
+      - '${ONBOARDING_PORT}:3000'
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - api-leads
+
+  api-core:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: api-core
+    ports:
+      - '${API_CORE_PORT}:3000'
+    environment:
+      NODE_ENV: development
+      DB_CORE_HOST: mongodb://localhost:27017/api-core
+      APP_NAME: api-core
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - db
+      - api-auth
+
+  api-realtime:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: api-realtime
+    ports:
+      - '${API_REALTIME_PORT}:3000'
+    environment:
+      NODE_ENV: development
+      APP_NAME: api-realtime
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - api-core
+
+  core-backoffice:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: core-backoffice
+    ports:
+      - '${CORE_BACKOFFICE_PORT}:3000'
+    environment:
+      NODE_ENV: development
+      APP_NAME: core-backoffice
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - api-core
+
+  manager:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: manager
+    ports:
+      - '${MANAGER_PORT}:4200'
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - api-core
+      - api-realtime
+
+  menu:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: menu
+    ports:
+      - '${MENU_PORT}:4200'
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - api-core
+
+  order:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: order
+    ports:
+      - '${ORDER_PORT}:4200'
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - api-core
+      - api-realtime
+
+  payment:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        APP_NAME: payment
+    ports:
+      - '${PAYMENT_PORT}:4200'
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - node_modules:/app/node_modules
+    depends_on:
+      - api-core
+
+networks:
+  default:
+    name: barnie_network
+    driver: bridge
+
+volumes:
+  db-data:
+  node_modules:

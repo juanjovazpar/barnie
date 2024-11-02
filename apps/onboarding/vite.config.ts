@@ -9,12 +9,12 @@ export default defineConfig({
   cacheDir: '../../node_modules/.vite/apps/onboarding',
 
   server: {
-    port: 4200,
+    port: parseInt(process.env.VITE_ONBOARDING_PORT, 10) || 4200,
     host: 'localhost',
   },
 
   preview: {
-    port: 4300,
+    port: parseInt(process.env.VITE_ONBOARDING_PORT, 10) || 4300,
     host: 'localhost',
   },
 

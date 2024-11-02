@@ -1,0 +1,58 @@
+@mixin badge-size($padding-x, $padding-y, $font-size) {
+  @apply px-#{$padding-x} py-#{$padding-y} text-#{$font-size};
+}
+
+@mixin badge-color($color) {
+  @apply bg-#{$color}-100 text-#{$color}-800;
+}
+
+.badge {
+  @apply inline-flex items-center gap-x-1.5 mx-1 text-xs font-medium;
+  @include badge-size(3, 1.5, sm);
+  @include badge-color('blue');
+
+  &,
+  &-square {
+    @apply rounded-sm;
+  }
+
+  &-pill {
+    @apply rounded-full;
+  }
+
+  &-xsmall {
+    @include badge-size(3, 1, xs);
+  }
+
+  &-small {
+    @include badge-size(4, 1, sm);
+  }
+
+  &-large {
+    @include badge-size(5, 1.5, lg);
+  }
+
+  &-blue {
+    @include badge-color('blue');
+  }
+
+  &-red {
+    @include badge-color('red');
+  }
+
+  &-orange {
+    @include badge-color('orange');
+  }
+
+  &-yellow {
+    @include badge-color('yellow');
+  }
+
+  &-green {
+    @include badge-color('green');
+  }
+
+  &-gray {
+    @include badge-color('gray');
+  }
+}
